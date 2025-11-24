@@ -5,3 +5,5 @@
 
 - draw each department using polygon from fltk -> blank map of France/departments (the sea departments are on the sides like a regular France map -> calculations needed)
 - draw the values and data things where they need to be (WGS 84 coordinates) with the right size
+
+source venv/bin/activate
