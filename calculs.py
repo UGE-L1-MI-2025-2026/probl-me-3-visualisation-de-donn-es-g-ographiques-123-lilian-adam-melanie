@@ -6,7 +6,7 @@ import math
 
 #import shapefile
 
-def wgs_to_mercator(pos) -> typing.Tuple[float, float]:
+def wgs_to_mercator(pos, map_scale) -> typing.Tuple[float, float]:
     R : float = 6378137.000
     lat, lon = pos[0], pos[1]
 
@@ -15,6 +15,8 @@ def wgs_to_mercator(pos) -> typing.Tuple[float, float]:
     pi = math.pi
     y = 180 / pi * math.log(math.tan(pi/4.0 + lat * (pi/180.0)/2.0)) * scale
 
+    x, y = x * map_scale, y * map_scale
+
     return (x, y)
 
 
@@ -22,7 +24,7 @@ def mercator_to_wgs():
     pass
 
 
-def convert_wgs_to_mercator(departments):
+def convert_wgs_to_mercator(departments, map_scale):
     departments_mercator : typing.Dict[str, typing.List[str, typing.List[typing.Tuple[float, float]]]] = { 
 
     }
@@ -30,7 +32,7 @@ def convert_wgs_to_mercator(departments):
     for department in departments:
         new_points : typing.List[typing.Tuple[float, float]] = [ ]
         for point in departments[department][1]:
-            new_point = wgs_to_mercator(point)
+            new_point = wgs_to_mercator(point, map_scale)
             new_points.append(new_point)
         departments_mercator[department] = [ departments[department][0], new_points ]
 
@@ -84,6 +86,13 @@ def get_points(sf) -> typing.Dict[str, int]:
         curr_record = sf.record(i)
         departments[curr_record[0]] = [curr_record[1], sf.shape(i).points]
     return departments
+
+
+def get_mercator_from_shp(file_name, map_scale):
+    sf = import_shp(file_name)
+    points = get_points(sf)
+    mercator_points = convert_wgs_to_mercator(points, map_scale)
+    return mercator_points
     
 
 # sf = shapefile.Reader("departements-20180101-shp.zip/departements-20180101.shp")
@@ -92,12 +101,12 @@ def get_points(sf) -> typing.Dict[str, int]:
 # print(sf.record(0)[0])
 # print(get_points(sf)["30"])
 
-sf = import_shp("departements-20180101-shp.zip/departements-20180101.shp")
-points = get_points(sf)
-#print(points["30"][1])
-#print(convert_wgs_to_mercator(points))
+# sf = import_shp("departements-20180101-shp.zip/departements-20180101.shp")
+# points = get_points(sf)
+# #print(points["30"][1])
+# #print(convert_wgs_to_mercator(points))
 
-mercator_points = convert_wgs_to_mercator(points)
+# mercator_points = convert_wgs_to_mercator(points)
 
 
 # -------------------------------XLXS----------------------------------------
@@ -114,4 +123,3 @@ mercator_points = convert_wgs_to_mercator(points)
 
 
 
-l

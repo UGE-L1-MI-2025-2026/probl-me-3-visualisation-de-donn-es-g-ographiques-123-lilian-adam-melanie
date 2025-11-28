@@ -11,15 +11,21 @@ hauteur = 750
 def dessiner_légende():
     pass
 
-def afficher_carte_coloree():
+def afficher_carte_coloree(file_name):
 
     #departements = charger_departements(chemin_dep)
+    departments = get_mercator_from_shp(file_name, 0.00005)
     '''pop_max = max()'''
     '''pop_min= min()'''
 
     #bbox = bbox_globale(departements)
     fltk.cree_fenetre(largeur,hauteur)
 
+    for department in departments:
+        points = departments[department][1]
+        #print(points)
+        fltk.polygone(points, couleur = "black", remplissage = "blue", epaisseur = 1)
+
     
     
     
@@ -28,15 +34,16 @@ def afficher_carte_coloree():
     
     
     
-    fltk.polygone([(2.3923284961351237, 48.335929161584076), (2.393003669902668, 48.336290983108846), (2.3940130169559044, 48.3356802622364), (2.3951130129955068, 48.3349251161054)],#points_dep, #points qui délimitent le département
-    couleur='black',
-    remplissage = 'blue', # pour plus tard : remp_coul variable change de couleurs en fonction des données
-    epaisseur = 50
-    )
+    # fltk.polygone([(2.3923284961351237, 48.335929161584076), (2.393003669902668, 48.336290983108846), (2.3940130169559044, 48.3356802622364), (2.3951130129955068, 48.3349251161054)],#points_dep, #points qui délimitent le département
+    # couleur='black',
+    # remplissage = 'blue', # pour plus tard : remp_coul variable change de couleurs en fonction des données
+    # epaisseur = 50
+    # )
 
 #dessiner_legende()
 
-afficher_carte_coloree()
+afficher_carte_coloree("departements-20180101-shp.zip/departements-20180101.shp")
+print("done")
 
 while True:
     fltk.mise_a_jour()
