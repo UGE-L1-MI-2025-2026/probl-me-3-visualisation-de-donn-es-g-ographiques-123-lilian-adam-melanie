@@ -1,6 +1,7 @@
 from requirements import shapefile as shapefile
 import typing
-import pyexcel_xlsx as pyxl
+from typing import List, Any
+from pyexcel import get_sheet, Sheet
 import json
 import math
 
@@ -112,14 +113,36 @@ def get_mercator_from_shp(file_name, map_scale):
 # -------------------------------XLXS----------------------------------------
 
 
-# def import_xlsx(file_name):
-#     data = pyxl.get_data(file_name)
-#     print(json.dump(data, dict)["III_1_insee_population_fr_depar"][0])
+# fichier avec les données
+CSV_DATA_TARGET = "datas/POPULATION_MUNICIPALE_DEPARTEMENT_FRANCE.csv"
+CSV_INDEX_NUM = 2  # index du num├®ro de d├®partement (INSEE) dans le fichier csv
 
-# import_xlsx("POPULATION_MUNICIPALE_DEPARTEMENT_FRANCE.xlsx")
+def get_data_from_csv(filepath: str) -> dict:
+    departements: dict = {}
+
+    raw_datas: list = []
+    with open(filepath, "r") as file:
+        raw_datas = file.readlines()
+
+    datas: List[List[str]] = [r.strip().split(',') for r in raw_datas]
+
+    headers: List[str] = datas[0]  # titre des colonnes
 
 
-# -------------------------------CSV----------------------------------------
+    for departement in datas[1:]:
+        departements[departement[CSV_INDEX_NUM]] = {}
+
+        for i, titre in enumerate(headers):
+            departements[departement[CSV_INDEX_NUM]][titre] = departement[i]
+
+    return departements
 
 
+def get_departement(departement: str) -> dict | None:
+    res = get_data_from_csv(CSV_DATA_TARGET)
+    if departement in res.keys():
+        return res[departement]
+    return None
 
+
+print(get_departement('94'))
