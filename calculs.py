@@ -128,13 +128,13 @@ def get_data_from_csv(filepath: str) -> dict:
 
     headers: List[str] = datas[0]  # titre des colonnes
 
-
     for departement in datas[1:]:
         departements[departement[CSV_INDEX_NUM]] = {}
 
         for i, titre in enumerate(headers):
             departements[departement[CSV_INDEX_NUM]][titre] = departement[i]
 
+    departements["headers"] = headers
     return departements
 
 
@@ -145,4 +145,59 @@ def get_departement(departement: str) -> dict | None:
     return None
 
 
-print(get_departement('94'))
+headers = get_departement("headers")
+departement = get_departement("75")
+
+
+BLEU = "#42009E"
+VIOLET = "#A30053"
+ROSE = "#FF084B"
+ORANGE = "#FF5A08"
+JAUNE = "#FFC108"
+
+def get_population_max(cle_annee = "p21_pop") -> int:
+    num_dep = list(get_data_from_csv(CSV_DATA_TARGET).keys())
+    num_dep.pop(-1)
+
+    departements = get_data_from_csv(CSV_DATA_TARGET)
+    
+    curr_max = int(departements[num_dep[0]][cle_annee])
+    num = 0
+    while num < len(num_dep):
+        pop_actuelle = int(departements[num_dep[num]][cle_annee])
+        if pop_actuelle > curr_max:
+            curr_max = pop_actuelle
+
+        num += 1
+
+    return curr_max
+
+
+
+def get_population_min(cle_annee = "p21_pop") -> int:
+    num_dep = list(get_data_from_csv(CSV_DATA_TARGET).keys())
+    num_dep.pop(-1)
+
+    departements = get_data_from_csv(CSV_DATA_TARGET)
+    
+    curr_min = int(departements[num_dep[0]][cle_annee])
+    num = 0
+    while num < len(num_dep):
+        pop_actuelle = int(departements[num_dep[num]][cle_annee])
+        if pop_actuelle < curr_min:
+            curr_min = pop_actuelle
+
+        num += 1
+
+    return curr_min
+
+def get_couleur(val: float, valeur_min: float, valeur_max: float) -> str:
+    normalise =  (val - valeur_min) / (valeur_max - valeur_min)
+
+    normalise *= 5
+    return [JAUNE, ORANGE, ROSE, VIOLET, BLEU][int(normalise)]
+
+
+epoque = 'p21_pop'
+couleur = get_couleur(int(departement[epoque]), get_population_max(epoque), get_population_min(epoque))
+print(couleur)
