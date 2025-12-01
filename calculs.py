@@ -1,7 +1,7 @@
 from requirements import shapefile as shapefile
 import typing
 from typing import List, Any
-from pyexcel import get_sheet, Sheet
+#from pyexcel import get_sheet, Sheet
 import json
 import math
 
@@ -12,7 +12,8 @@ def wgs_to_mercator(pos, map_scale=1) -> typing.Tuple[float, float]:
     lat, lon = pos[0], pos[1]
 
     x = R * math.radians(lon)
-    scale = x / lon
+    if lon != 0: scale = x / lon
+    else: scale = x
     pi = math.pi
     y = 180 / pi * math.log(math.tan(pi/4.0 + lat * (pi/180.0)/2.0)) * scale
 
@@ -184,16 +185,20 @@ def get_mercator_from_shp(file_name, map_size, map_scale=0.00005):
     bottom_left, up_right = (box[0], box[1]), (box[2], box[3])
     bbox_center = wgs_to_mercator(get_center(bottom_left, up_right))
     map_center = get_center((0, 0), (map_size[0], map_size[1]))
+
+    bbox_diagonal = get_distance(wgs_to_mercator(bottom_left), wgs_to_mercator(up_right))
+    map_diagonal = get_distance((0,0), map_size)
     distance = bbox_center[0] - map_center[0], bbox_center[1] - map_center[1]
-    #scale = (get_distance((0, 0), (box[3], 0)))/map_size[0], (get_distance((0, 0), (0, box[1])))/map_size[1]
-    scale = map_center[0]/bbox_center[0], map_center[1]/bbox_center[1]
+    ##scale = (get_distance((0, 0), (box[3], 0)))/map_size[0], (get_distance((0, 0), (0, box[1])))/map_size[1]
+    #scale = map_center[0]/bbox_center[0], map_center[1]/bbox_center[1]
+    scale = map_diagonal/bbox_diagonal, map_diagonal/bbox_diagonal
 
     # bbox_center = wgs_to_mercator(get_center(bottom_left, up_right))
     # bbox_center = bbox_center[0]/(map_size[0]*map_size[1]), bbox_center[1]/(map_size[1]*map_size[0])
     # map_center = get_center((0, 0), (map_size[0], map_size[1]))
     # #distance = bbox_center[0] - map_center[0], bbox_center[1] - map_center[1]
     # distance = map_center[0] - bbox_center[0], map_center[1] - bbox_center[1]
-    print(box, bbox_center, map_center, distance)
+    print(box, bbox_center, map_center, distance, scale)
 
     mercator_points = convert_wgs_to_mercator(points, center= map_center, scale= scale, map_scale=map_size, distance=distance)
     return mercator_points
@@ -323,6 +328,6 @@ def get_couleur(val: float, valeur_min: float, valeur_max: float) -> str:
     return [JAUNE, ORANGE, ROSE, VIOLET, BLEU][int(normalise)]
 
 
-epoque = 'p21_pop'
-couleur = get_couleur(int(departement[epoque]), get_population_max(epoque), get_population_min(epoque))
-print(couleur)
+# epoque = 'p21_pop'
+# couleur = get_couleur(int(departement[epoque]), get_population_max(epoque), get_population_min(epoque))
+# print(couleur)
