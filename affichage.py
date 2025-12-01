@@ -14,12 +14,13 @@ def dessiner_légende():
 def afficher_carte_coloree(file_name):
 
     #departements = charger_departements(chemin_dep)
-    departments = get_mercator_from_shp(file_name, 0.00005)
+    departments = get_mercator_from_shp(file_name, (largeur, hauteur))
+    #print(departments)
     '''pop_max = max()'''
     '''pop_min= min()'''
 
     #bbox = bbox_globale(departements)
-    fltk.cree_fenetre(largeur,hauteur)
+    fltk.cree_fenetre(largeur,hauteur, affiche_repere=True)
 
     for department in departments:
         points = departments[department][1]
