@@ -30,7 +30,7 @@ def scale_point(point, center, scale):
 
 
 def convert_wgs_to_mercator(departments, center, scale, map_scale=(1,1) , distance=(0, 0)):
-    departments_mercator : typing.Dict[str, typing.List[str, typing.List[typing.Tuple[float, float]]]] = { 
+    departments_mercator : typing.Dict[str, typing.List[str, typing.List[typing.Tuple[float, float]]]] = {
 
     }
 
@@ -72,7 +72,7 @@ def scale_point(point, scale) -> typing.Tuple[float, float]:
 
 
 def scale_points(departments, scale):
-    departments_scaled : typing.Dict[str, typing.List[str, typing.List[typing.Tuple[float, float]]]] = { 
+    departments_scaled : typing.Dict[str, typing.List[str, typing.List[typing.Tuple[float, float]]]] = {
 
     }
     for department in departments:
@@ -85,7 +85,7 @@ def scale_points(departments, scale):
     return departments_scaled
 
 
-def get_dist_corners_center():  
+def get_dist_corners_center():
     pass
 
 """
@@ -105,7 +105,7 @@ for each polygon:
 
 
 def calculate_box(corners):
-    north, west, east, south = 0, 0, 0, 0
+    west, south, east, north = 0, corners[0][1], corners[0][0], 0
     for i in range(len(corners)):
         for point in corners[i]:
             if point[0] <= west: west = point[0]
@@ -127,19 +127,19 @@ def calculate_box(corners):
 
 def import_shp(file_name) -> shapefile:
     """
-    Parameter: 
+    Parameter:
         file_name : str = name/path of the shapefile (.shp)
     Returns:
         sf : shapefile = the content of the shapefile file
     Imports a shp file and returns its content
-    
+
     """
     # shapefile
     sf : shapefile = shapefile.Reader(file_name)
 
     return sf
 
-def get_points(sf) -> typing.Dict[str, int]:
+def get_points(sf, outremers= False) -> typing.Dict[str, int]:
     """
     Parameter:
         sf : shapefile = content of a shapefile file
@@ -157,10 +157,15 @@ def get_points(sf) -> typing.Dict[str, int]:
 
     for i in range(len(sf_shapes)):
         curr_record = sf.record(i)
-        if len(curr_record[0]) < 3: departments[curr_record[0]] = [curr_record[1], sf.shape(i).points]
+        if not(outremers) and len(curr_record[0]) < 3: departments[curr_record[0]] = [curr_record[1], sf.shape(i).points]
     return departments
 
 
+"""
+ALGO 2
+get the corners coordinates (bounding box) of the mercator map
+calculate the vertical and horizontal scale of the map based on the size of the window and the size of the mercator map
+"""
 
 
 def calculate_distance(point1, point2):
@@ -204,8 +209,16 @@ def get_mercator_from_shp(file_name, map_size, map_scale=0.00005):
     return mercator_points
 
 
+def try_stuff(file_name, map_size):
+    sf = import_shp(file_name)
+    points = get_points(sf)
+    corners = calculate_box(points) # west, south, east,  north
+    bottom_left, up_right = (corners[0], corners[1]), (corners[2], corners[3])
+    distance_bl, distance_ur = get_distance((0, 0), bottom_left), get_distance((map_size, up_right))
+
+
 def do_everything(departments, box, map_size):
-    departments_mercator : typing.Dict[str, typing.List[str, typing.List[typing.Tuple[float, float]]]] = { 
+    departments_mercator : typing.Dict[str, typing.List[str, typing.List[typing.Tuple[float, float]]]] = {
 
     }
 
@@ -223,11 +236,76 @@ def do_everything(departments, box, map_size):
         departments_mercator[department] = [ departments[department][0], new_points ]
 
     return departments_mercator
-    
 
-#sf = shapefile.Reader("departements-20180101-shp.zip/departements-20180101.shp")
+
+from math import log, tan, pi, radians, degrees
+
+def mercator(long, lat):
+    x = long
+    y = degrees(log(tan(radians(lat) / 2 + pi / 4)))
+    return x, y
+
+
+def wgs_to_mercator(departments, scale):
+    departments_mercator : typing.Dict[str, typing.List[str, typing.List[typing.Tuple[float, float]]]] = {
+
+    }
+
+    #map_scale = (map_scale[0] * map_scale[0], map_scale[1] * map_scale[1])
+
+    for department in departments:
+        new_points : typing.List[typing.Tuple[float, float]] = [ ]
+        for curr_point in departments[department][1]:
+            merc_curr_point = mercator(curr_point)
+            new_points.append(merc_curr_point)
+        departments_mercator[department] = [ departments[department][0], new_points ]
+
+    return departments_mercator
+
+
+def do_everything_fr(file_name, map_size):
+##    width, height = map_size[0], map_size[1]
+##    sf = import_shp(file_name)
+##    points = get_points(sf)
+##    corners = calculate_box(points) # west, south, east,  north
+##    bottom_left, up_right = (corners[0], corners[1]), (corners[2], corners[3])
+##    dist_boxh = get_distance((0,0), (0, corners[1]))
+##    dist_maph = get_distance((0,0), (0, height))
+##    dist_boxw = get_distance((0,0), (corners[2], (0,0)))
+##    dist_mapw = get_distance((0,0), (0, height))
+##    #scale = dist_box/dist_map
+
+
+
+    sf = import_shp(file_name)
+    points = get_points(sf, True)
+
+    width, height = map_size[0], map_size[1]
+    x_min, y_min, x_max, y_max = sf.bbox
+
+    width_adj, height_adj = width/(x_max - x_min), height/(y_max - y_min)
+    scale = min(width_adj, height_adj)
+
+    if scale == width_adj: width_adjust = width_adj
+    if scale == height_adj: height_adjust = height_adj
+
+
+
+    #scale = min(W/(x2-x1), H/(y1-y2))
+    #si scale = W/(x2-x1), B = X0 - ax1
+    #si scale = H/(y1-y2), C = Y0 + ay1
+
+
+
+#homothétie
+
+
+
+
+sf = shapefile.Reader("departements-20180101-shp/departements-20180101.shp")
 #print(sf.records())
-#print(sf.bbox)
+print(sf.bbox)
+print(get_points(sf))
 #print(sf.shape(0))
 #print(sf.record(0)[0])
 #print(get_points(sf)["30"])
@@ -290,7 +368,7 @@ def get_population_max(cle_annee = "p21_pop") -> int:
     num_dep.pop(-1)
 
     departements = get_data_from_csv(CSV_DATA_TARGET)
-    
+
     curr_max = int(departements[num_dep[0]][cle_annee])
     num = 0
     while num < len(num_dep):
@@ -309,7 +387,7 @@ def get_population_min(cle_annee = "p21_pop") -> int:
     num_dep.pop(-1)
 
     departements = get_data_from_csv(CSV_DATA_TARGET)
-    
+
     curr_min = int(departements[num_dep[0]][cle_annee])
     num = 0
     while num < len(num_dep):
