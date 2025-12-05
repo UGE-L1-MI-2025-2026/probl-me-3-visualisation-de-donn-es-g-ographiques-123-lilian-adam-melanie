@@ -9,22 +9,34 @@ hauteur = 900
 
 
 def dessiner_legende():
-    xo = largeur - 40
-    yo = 20
-    ho = hauteur - 40
-    fltk.rectangle(ax=xo, ay=yo, bx=xo+ho, by=yo+ho, couleur = 'black', remplissage='red', epaisseur=5)
+    taille_x = 100
+    taille_y = hauteur // len(PALETTE_COULEURS)
+    for i, couleur in enumerate(PALETTE_COULEURS):
+        ax=largeur - taille_x
+        ay=taille_y * max(1, i), 
+        bx=largeur
+        by=(taille_y**2) * i,
+            
+        fltk.texte(ax, ay, "oe")
+        fltk.rectangle(
+            ax, ay, bx, by,
+            couleur = "black", remplissage=couleur, epaisseur=1
+        )
 
-def afficher_carte_coloree(file_name):
+def get_index_str_in_lst(lst, string) -> int:
+    index = 0
+    for s in lst:
+        if s == string:
+            return index
+        index += 1
 
-    #departements = charger_departements(chemin_dep)
-    departments = get_mercator_from_shp(file_name, (largeur, hauteur))
-    #print(departments)
-    '''pop_max = max()'''
-    '''pop_min= min()'''
+    return -1
 
-    #bbox = bbox_globale(departements)
-    fltk.cree_fenetre(largeur,hauteur, affiche_repere=True)
+def afficher_carte_coloree(file_name, epoque: str = "p21_pop"):
+    departements_shp = get_mercator_from_shp(file_name, (largeur, hauteur))
+    headers = get_departement("headers")
 
+<<<<<<< HEAD
     for department in departments:
         
         if department == "isles":
@@ -43,6 +55,18 @@ def afficher_carte_coloree(file_name):
     
     
     
+=======
+    pop_max = get_population_max(epoque)
+    pop_min = get_population_min(epoque)
+
+    for num_dep in departements_shp:
+        points = departements_shp[num_dep][1]
+        dep_pop = int(get_departement(num_dep)[epoque])
+        col_dep = get_couleur(dep_pop, pop_min, pop_max, PALETTE_COULEURS)
+        print(col_dep)
+
+        fltk.polygone(points, couleur = "black", remplissage = col_dep, epaisseur = 1)
+>>>>>>> 33c1b05dcc404c2c453dc433c0781f0514a0159a
     
     
     
@@ -52,10 +76,8 @@ def afficher_carte_coloree(file_name):
     epaisseur = 5
     )
 
-#dessiner_legende()
-
-#afficher_carte_coloree("departements-20180101-shp.zip/departements-20180101.shp")
-afficher_carte_coloree("departements-20180101/departements-20180101.shp")
+fltk.cree_fenetre(largeur,hauteur, affiche_repere=True)
+afficher_carte_coloree("departements-20180101-shp/departements-20180101")
 print("done")
 dessiner_legende()
 

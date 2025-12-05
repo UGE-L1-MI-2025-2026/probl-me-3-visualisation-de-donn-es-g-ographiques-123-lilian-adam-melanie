@@ -239,7 +239,7 @@ def get_mercator_from_shp_bis(file_name, map_size, map_scale=0.00005):
     # map_center = get_center((0, 0), (map_size[0], map_size[1]))
     # #distance = bbox_center[0] - map_center[0], bbox_center[1] - map_center[1]
     # distance = map_center[0] - bbox_center[0], map_center[1] - bbox_center[1]
-    print(box, bbox_center, map_center, distance, scale)
+    #print(box, bbox_center, map_center, distance, scale)
 
     mercator_points = convert_wgs_to_mercator(points, center= map_center, scale= scale, map_scale=map_size, distance=distance)
     return mercator_points
@@ -497,8 +497,6 @@ def get_departement(departement: str) -> dict | None:
     return None
 
 
-headers = get_departement("headers")
-departement = get_departement("75")
 
 
 BLEU = "#42009E"
@@ -543,13 +541,56 @@ def get_population_min(cle_annee = "p21_pop") -> int:
 
     return curr_min
 
-def get_couleur(val: float, valeur_min: float, valeur_max: float) -> str:
+# source: https://coolors.co/
+PALETTE_COULEURS = ["#370617","#6a040f","#9d0208","#d00000","#dc2f02","#e85d04","#f48c06","#faa307","#ffba08"]
+PALETTE_COULEURS.reverse()
+
+def get_couleur(val: float, valeur_min: float, valeur_max: float, couleurs: list = None) -> str:
     normalise =  (val - valeur_min) / (valeur_max - valeur_min)
+    normalise *= len(couleurs)
+    normalise = int(normalise)
+    normalise = min(normalise, len(couleurs)-1)
 
-    normalise *= 5
-    return [JAUNE, ORANGE, ROSE, VIOLET, BLEU][int(normalise)]
+    return couleurs[normalise]
 
 
-# epoque = 'p21_pop'
-# couleur = get_couleur(int(departement[epoque]), get_population_max(epoque), get_population_min(epoque))
-# print(couleur)
+HEADER_INDEX_POP = 5
+
+
+def main():
+    headers = get_departement("headers")
+    
+    departement = get_departement("75")
+    print(departement["nom_dep"])
+
+
+    epoques = headers[5:]
+    for epoque in epoques:
+        couleur = get_couleur(int(departement[epoque]), get_population_max(epoque), get_population_min(epoque), PALETTE_COULEURS)
+        print(
+            f"{epoque = }"
+            f"population: {departement[epoque]}, couleur = {couleur}"
+        )
+
+
+
+    print("=" * 100)
+
+
+    departement = get_departement("94")
+    print(departement["nom_dep"])
+
+
+    epoques = headers[5:]
+    for epoque in epoques:
+        couleur = get_couleur(int(departement[epoque]), get_population_max(epoque), get_population_min(epoque), PALETTE_COULEURS)
+        print(
+            f"{epoque = }"
+            f"population: {departement[epoque]}, couleur = {couleur}"
+        )
+
+
+
+
+if __name__ == "__main__":
+    main()
