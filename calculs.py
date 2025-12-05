@@ -203,7 +203,7 @@ def get_mercator_from_shp(file_name, map_size, map_scale=0.00005):
     # map_center = get_center((0, 0), (map_size[0], map_size[1]))
     # #distance = bbox_center[0] - map_center[0], bbox_center[1] - map_center[1]
     # distance = map_center[0] - bbox_center[0], map_center[1] - bbox_center[1]
-    print(box, bbox_center, map_center, distance, scale)
+    #print(box, bbox_center, map_center, distance, scale)
 
     mercator_points = convert_wgs_to_mercator(points, center= map_center, scale= scale, map_scale=map_size, distance=distance)
     return mercator_points
@@ -304,8 +304,8 @@ def do_everything_fr(file_name, map_size):
 
 sf = shapefile.Reader("departements-20180101-shp/departements-20180101.shp")
 #print(sf.records())
-print(sf.bbox)
-print(get_points(sf))
+#print(sf.bbox)
+#print(get_points(sf))
 #print(sf.shape(0))
 #print(sf.record(0)[0])
 #print(get_points(sf)["30"])
@@ -353,8 +353,6 @@ def get_departement(departement: str) -> dict | None:
     return None
 
 
-headers = get_departement("headers")
-departement = get_departement("75")
 
 
 BLEU = "#42009E"
@@ -399,13 +397,58 @@ def get_population_min(cle_annee = "p21_pop") -> int:
 
     return curr_min
 
-def get_couleur(val: float, valeur_min: float, valeur_max: float) -> str:
+# source: https://coolors.co/palette/ff4800-ff5400-ff6000-ff6d00-ff7900-ff8500-ff9100-ff9e00-ffaa00-ffb600
+couleurs = [
+    "#FF4800",
+    "#FF5400",
+    "#FF6000",
+    "#FF6D00",
+    "#FF7900",
+    "#FF8500",
+    "#FF9100",
+    "#FF9E00",
+    "#FFAA00",
+    "#FFB600"
+]
+
+def get_couleur(val: float, valeur_min: float, valeur_max: float, couleurs: list = None) -> str:
     normalise =  (val - valeur_min) / (valeur_max - valeur_min)
+    normalise *= len(couleurs)
 
-    normalise *= 5
-    return [JAUNE, ORANGE, ROSE, VIOLET, BLEU][int(normalise)]
+    if couleurs == None:
+        couleurs = [JAUNE, ORANGE, ROSE, VIOLET, BLEU]
+    return couleurs[int(normalise)]
 
 
-# epoque = 'p21_pop'
-# couleur = get_couleur(int(departement[epoque]), get_population_max(epoque), get_population_min(epoque))
-# print(couleur)
+HEADER_INDEX_POP = 5
+headers = get_departement("headers")
+
+
+departement = get_departement("75")
+print(departement["nom_dep"])
+
+
+epoques = headers[5:]
+for epoque in epoques:
+    couleur = get_couleur(int(departement[epoque]), get_population_max(epoque), get_population_min(epoque), couleurs)
+    print(
+        f"{epoque = }"
+        f"population: {departement[epoque]}, couleur = {couleur}"
+    )
+
+
+
+print("=" * 100)
+
+
+departement = get_departement("94")
+print(departement["nom_dep"])
+
+
+epoques = headers[5:]
+for epoque in epoques:
+    couleur = get_couleur(int(departement[epoque]), get_population_max(epoque), get_population_min(epoque), couleurs)
+    print(
+        f"{epoque = }"
+        f"population: {departement[epoque]}, couleur = {couleur}"
+    )
