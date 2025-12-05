@@ -7,7 +7,7 @@ import math
 
 #import shapefile
 
-def wgs_to_mercator(pos, map_scale=1) -> typing.Tuple[float, float]:
+def wgs_to_mercator_bis(pos, map_scale=1) -> typing.Tuple[float, float]:
     R : float = 6378137.000
     lat, lon = pos[0], pos[1]
 
@@ -157,7 +157,9 @@ def get_points(sf, outremers= False) -> typing.Dict[str, int]:
 
     for i in range(len(sf_shapes)):
         curr_record = sf.record(i)
-        if not(outremers) and len(curr_record[0]) < 3: departments[curr_record[0]] = [curr_record[1], sf.shape(i).points]
+        #if not(outremers) and len(curr_record[0]) < 3: departments[curr_record[0]] = [curr_record[1], sf.shape(i).points]
+        if outremers and len(curr_record[0]) >= 3: continue
+        else: departments[curr_record[0]] = [curr_record[1], sf.shape(i).points]
     return departments
 
 
@@ -172,7 +174,7 @@ def calculate_distance(point1, point2):
     dist = point2[0]
 
 
-def get_mercator_from_shp(file_name, map_size, map_scale=0.00005):
+def get_mercator_from_shp_bis(file_name, map_size, map_scale=0.00005):
     """
     Parameters:
         map_size : typing.Tuple[int, int] = respectively the width and height of the map
@@ -246,7 +248,24 @@ def mercator(long, lat):
     return x, y
 
 
-def wgs_to_mercator(departments, scale):
+def calcule_parametres(x_min, y_min, x_max, y_max, x_orig, y_orig, W, H): # -> (a, B, C)
+    # a: scale; B = décalage des abscisse, C = décalage des ordonnées
+
+    a_abscisses =  W / (x_max - x_min)
+    a_ordonnees = H / (y_max - y_min)
+    a = min(a_abscisses, a_ordonnees)
+
+    B = x_orig - (a * x_min)
+    C = y_orig + (a * y_min)
+
+    return a, B, C
+
+#place_point = lambda x, y, a, B, C: (a * x + B, -a * y + C)
+def place_point(x, y, a, B, C):
+    return (a*x) + B, ((0-a)*y) + C
+
+
+def wgs_to_mercator_bis(departments, scale, x_offset, y_offset):
     departments_mercator : typing.Dict[str, typing.List[str, typing.List[typing.Tuple[float, float]]]] = {
 
     }
@@ -256,14 +275,47 @@ def wgs_to_mercator(departments, scale):
     for department in departments:
         new_points : typing.List[typing.Tuple[float, float]] = [ ]
         for curr_point in departments[department][1]:
-            merc_curr_point = mercator(curr_point)
+            merc_curr_point = mercator(curr_point[0], curr_point[1])
+            placed_point = place_point(merc_curr_point[0], merc_curr_point[1], scale, x_offset, y_offset)
+            new_points.append(placed_point)
+        departments_mercator[department] = [ departments[department][0], new_points ]
+
+    return departments_mercator
+
+
+def wgs_to_mercator(departments):
+    departments_mercator : typing.Dict[str, typing.List[str, typing.List[typing.Tuple[float, float]]]] = {
+
+    }
+
+    #map_scale = (map_scale[0] * map_scale[0], map_scale[1] * map_scale[1])
+
+    for department in departments:
+        new_points : typing.List[typing.Tuple[float, float]] = [ ]
+        for curr_point in departments[department][1]:
+            merc_curr_point = mercator(curr_point[0], curr_point[1])
             new_points.append(merc_curr_point)
         departments_mercator[department] = [ departments[department][0], new_points ]
 
     return departments_mercator
 
 
-def do_everything_fr(file_name, map_size):
+def place_all_points(departments, scale, x_offset, y_offset, width, height):
+    new_departments : typing.Dict[str, typing.List[str, typing.List[typing.Tuple[float, float]]]] = {
+
+    }
+    for department in departments:
+        new_points : typing.List[typing.Tuple[float, float]] = [ ]
+        for curr_point in departments[department][1]:
+            new_point = place_point(curr_point[0], curr_point[1], scale, x_offset, y_offset)
+            new_point = new_point[0], height + new_point[1]
+            new_points.append(new_point)
+        new_departments[department] = [ departments[department][0], new_points ]
+    return new_departments
+
+
+
+def get_mercator_from_shp(file_name, map_size):
 ##    width, height = map_size[0], map_size[1]
 ##    sf = import_shp(file_name)
 ##    points = get_points(sf)
@@ -279,15 +331,26 @@ def do_everything_fr(file_name, map_size):
 
     sf = import_shp(file_name)
     points = get_points(sf, True)
+    #print(points)
 
     width, height = map_size[0], map_size[1]
     x_min, y_min, x_max, y_max = sf.bbox
+    (x_min_merc, y_min_merc), (x_max_merc, y_max_merc) = mercator(x_min, y_min), mercator(x_max, y_max)
 
-    width_adj, height_adj = width/(x_max - x_min), height/(y_max - y_min)
-    scale = min(width_adj, height_adj)
+    scale, x_offset, y_offset = calcule_parametres(x_min_merc, y_min_merc, x_max_merc, y_max_merc, 0, 0, width, height)
+    print(scale, x_offset, y_offset)
+    departments_mercator = wgs_to_mercator(points)
+    placed_departments = place_all_points(departments_mercator, scale, x_offset, y_offset, width, height)
+    print(departments_mercator == placed_departments)
 
-    if scale == width_adj: width_adjust = width_adj
-    if scale == height_adj: height_adjust = height_adj
+    return placed_departments
+
+
+    # width_adj, height_adj = width/(x_max - x_min), height/(y_max - y_min)
+    # scale = min(width_adj, height_adj)
+
+    # if scale == width_adj: width_adjust = width_adj
+    # if scale == height_adj: height_adjust = height_adj
 
 
 
@@ -302,7 +365,7 @@ def do_everything_fr(file_name, map_size):
 
 
 
-sf = shapefile.Reader("departements-20180101-shp/departements-20180101.shp")
+#sf = shapefile.Reader("departements-20180101-shp/departements-20180101.shp")
 #print(sf.records())
 #print(sf.bbox)
 #print(get_points(sf))
