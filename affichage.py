@@ -26,10 +26,19 @@ def afficher_carte_coloree(file_name):
     fltk.cree_fenetre(largeur,hauteur, affiche_repere=True)
 
     for department in departments:
-        points = departments[department][1]
+        
+        if department == "isles":
+            print(departments[department])
+            for isle in departments[department][1]:
+                #points = departments["isles"][1]
+                points = isle
+                print(points)
+                fltk.polygone(points, couleur = "black", remplissage = "blue", epaisseur = 1)
         #print(points)
-
-        fltk.polygone(points, couleur = "black", remplissage = "blue", epaisseur = 1)
+        else:
+            print(departments[department])
+            points = departments[department][1]
+            fltk.polygone(points, couleur = "black", remplissage = "blue", epaisseur = 1)
     
     
     
