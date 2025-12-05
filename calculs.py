@@ -461,57 +461,68 @@ def get_population_min(cle_annee = "p21_pop") -> int:
     return curr_min
 
 # source: https://coolors.co/palette/ff4800-ff5400-ff6000-ff6d00-ff7900-ff8500-ff9100-ff9e00-ffaa00-ffb600
-couleurs = [
-    "#FF4800",
-    "#FF5400",
-    "#FF6000",
-    "#FF6D00",
-    "#FF7900",
-    "#FF8500",
-    "#FF9100",
-    "#FF9E00",
-    "#FFAA00",
-    "#FFB600"
+PALETTE_COULEURS = [
+    "#03071E",
+    "#370617",
+    "#6A040F",
+    "#9D0208",
+    "#D00000",
+    "#DC2F02",
+    "#E85D04",
+    "#F48C06",
+    "#FAA307",
+    "#FFBA08"
 ]
 
 def get_couleur(val: float, valeur_min: float, valeur_max: float, couleurs: list = None) -> str:
     normalise =  (val - valeur_min) / (valeur_max - valeur_min)
     normalise *= len(couleurs)
+    normalise = int(normalise)
+    normalise = min(normalise, len(couleurs)-1)
 
     if couleurs == None:
         couleurs = [JAUNE, ORANGE, ROSE, VIOLET, BLEU]
-    return couleurs[int(normalise)]
+
+    return couleurs[normalise]
 
 
 HEADER_INDEX_POP = 5
-headers = get_departement("headers")
 
 
-departement = get_departement("75")
-print(departement["nom_dep"])
+def main():
+    headers = get_departement("headers")
+    
+    departement = get_departement("75")
+    print(departement["nom_dep"])
 
 
-epoques = headers[5:]
-for epoque in epoques:
-    couleur = get_couleur(int(departement[epoque]), get_population_max(epoque), get_population_min(epoque), couleurs)
-    print(
-        f"{epoque = }"
-        f"population: {departement[epoque]}, couleur = {couleur}"
-    )
+    epoques = headers[5:]
+    for epoque in epoques:
+        couleur = get_couleur(int(departement[epoque]), get_population_max(epoque), get_population_min(epoque), PALETTE_COULEURS)
+        print(
+            f"{epoque = }"
+            f"population: {departement[epoque]}, couleur = {couleur}"
+        )
 
 
 
-print("=" * 100)
+    print("=" * 100)
 
 
-departement = get_departement("94")
-print(departement["nom_dep"])
+    departement = get_departement("94")
+    print(departement["nom_dep"])
 
 
-epoques = headers[5:]
-for epoque in epoques:
-    couleur = get_couleur(int(departement[epoque]), get_population_max(epoque), get_population_min(epoque), couleurs)
-    print(
-        f"{epoque = }"
-        f"population: {departement[epoque]}, couleur = {couleur}"
-    )
+    epoques = headers[5:]
+    for epoque in epoques:
+        couleur = get_couleur(int(departement[epoque]), get_population_max(epoque), get_population_min(epoque), PALETTE_COULEURS)
+        print(
+            f"{epoque = }"
+            f"population: {departement[epoque]}, couleur = {couleur}"
+        )
+
+
+
+
+if __name__ == "__main__":
+    main()
