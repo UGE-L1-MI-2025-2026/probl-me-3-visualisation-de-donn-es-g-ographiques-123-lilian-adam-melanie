@@ -105,7 +105,8 @@ for each polygon:
 
 
 def calculate_box(corners):
-    west, south, east, north = 0, corners[0][1], corners[0][0], 0
+    west, south, east, north = corners[0][0][0], corners[0][0][1], corners[0][0][0], corners[0][0][1]
+    print(west, south, east, north)
     for i in range(len(corners)):
         for point in corners[i]:
             if point[0] <= west: west = point[0]
@@ -160,6 +161,7 @@ def get_points(sf, outremers= False) -> typing.Dict[str, int]:
         #if not(outremers) and len(curr_record[0]) < 3: departments[curr_record[0]] = [curr_record[1], sf.shape(i).points]
         if outremers and len(curr_record[0]) >= 3: continue
         else: departments[curr_record[0]] = [curr_record[1], sf.shape(i).points]
+        
     return departments
 
 
@@ -228,7 +230,6 @@ def do_everything(departments, box, map_size):
     bbox_center = wgs_to_mercator(get_center(bottom_left, up_right))
     map_center = get_center((0, 0), (map_size[0], map_size[1]))
     distance = bbox_center[0] - map_center[0], bbox_center[1] - map_center[1]
-
     for department in departments:
         new_points : typing.List[typing.Tuple[float, float]] = [ ]
         for curr_point in departments[department][1]:
@@ -314,6 +315,13 @@ def place_all_points(departments, scale, x_offset, y_offset, width, height):
     return new_departments
 
 
+def separate_isles(sf, departments):
+    departments["isles"] = ["isles"]
+    #for shape in sf.shapes()
+    sf_parts = sf.parts()
+
+
+
 
 def get_mercator_from_shp(file_name, map_size):
 ##    width, height = map_size[0], map_size[1]
@@ -329,19 +337,32 @@ def get_mercator_from_shp(file_name, map_size):
 
 
 
+    outremers = True
     sf = import_shp(file_name)
-    points = get_points(sf, True)
+    points = get_points(sf, outremers)
+    prep_corners = points["29"][1], points["59"][1], points["2B"][1], points["2A"][1]
+    print(prep_corners[0])
+    corners = calculate_box(prep_corners) # west, south, east,  north
+    #bottom_left, up_right = (corners[0], corners[1]), (corners[2], corners[3])
+    (x_min, y_min), (x_max, y_max) = (corners[0], corners[3]), (corners[2], corners[1])
     #print(points)
 
     width, height = map_size[0], map_size[1]
-    x_min, y_min, x_max, y_max = sf.bbox
+    box_x_min, box_y_min, box_x_max, box_y_max = sf.bbox
+
+    if not(outremers):
+        if box_x_min <= x_min: x_min = box_x_min
+        if box_y_min <= y_min: y_min = box_y_min
+        if x_max <= box_x_max: x_max = box_x_max
+        if y_max <= box_y_max: y_max = box_y_max
+
     (x_min_merc, y_min_merc), (x_max_merc, y_max_merc) = mercator(x_min, y_min), mercator(x_max, y_max)
 
     scale, x_offset, y_offset = calcule_parametres(x_min_merc, y_min_merc, x_max_merc, y_max_merc, 0, 0, width, height)
     print(scale, x_offset, y_offset)
     departments_mercator = wgs_to_mercator(points)
     placed_departments = place_all_points(departments_mercator, scale, x_offset, y_offset, width, height)
-    print(departments_mercator == placed_departments)
+    #print(departments_mercator == placed_departments)
 
     return placed_departments
 
