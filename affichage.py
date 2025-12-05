@@ -18,7 +18,7 @@ def afficher_carte_coloree(file_name):
 
     #departements = charger_departements(chemin_dep)
     departments = get_mercator_from_shp(file_name, (largeur, hauteur))
-    print(departments)
+    #print(departments)
     '''pop_max = max()'''
     '''pop_min= min()'''
 
