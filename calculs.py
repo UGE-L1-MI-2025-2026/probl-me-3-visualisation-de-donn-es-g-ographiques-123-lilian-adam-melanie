@@ -106,7 +106,7 @@ for each polygon:
 
 def calculate_box(corners):
     west, south, east, north = corners[0][0][0], corners[0][0][1], corners[0][0][0], corners[0][0][1]
-    print(west, south, east, north)
+    #print(west, south, east, north)
     for i in range(len(corners)):
         for point in corners[i]:
             if point[0] <= west: west = point[0]
@@ -213,6 +213,7 @@ def get_mercator_from_shp_bis(file_name, map_size, map_scale=0.00005):
     return mercator_points
 
 
+"""
 def try_stuff(file_name, map_size):
     sf = import_shp(file_name)
     points = get_points(sf)
@@ -220,7 +221,8 @@ def try_stuff(file_name, map_size):
     bottom_left, up_right = (corners[0], corners[1]), (corners[2], corners[3])
     distance_bl, distance_ur = get_distance((0, 0), bottom_left), get_distance((map_size, up_right))
 
-
+"""
+"""
 def do_everything(departments, box, map_size):
     departments_mercator : typing.Dict[str, typing.List[str, typing.List[typing.Tuple[float, float]]]] = {
 
@@ -239,7 +241,7 @@ def do_everything(departments, box, map_size):
         departments_mercator[department] = [ departments[department][0], new_points ]
 
     return departments_mercator
-
+"""
 
 from math import log, tan, pi, radians, degrees
 
@@ -263,7 +265,7 @@ def calcule_parametres(x_min, y_min, x_max, y_max, x_orig, y_orig, W, H): # -> (
 
 #place_point = lambda x, y, a, B, C: (a * x + B, -a * y + C)
 def place_point(x, y, a, B, C):
-    return (a*x) + B, ((0-a)*y) + C
+    return (a*x) + B, ((-a)*y) + C
 
 
 def wgs_to_mercator_bis(departments, scale, x_offset, y_offset):
@@ -341,7 +343,7 @@ def get_mercator_from_shp(file_name, map_size):
     sf = import_shp(file_name)
     points = get_points(sf, outremers)
     prep_corners = points["29"][1], points["59"][1], points["2B"][1], points["2A"][1]
-    print(prep_corners[0])
+    #print(prep_corners[0])
     corners = calculate_box(prep_corners) # west, south, east,  north
     #bottom_left, up_right = (corners[0], corners[1]), (corners[2], corners[3])
     (x_min, y_min), (x_max, y_max) = (corners[0], corners[3]), (corners[2], corners[1])
@@ -359,7 +361,7 @@ def get_mercator_from_shp(file_name, map_size):
     (x_min_merc, y_min_merc), (x_max_merc, y_max_merc) = mercator(x_min, y_min), mercator(x_max, y_max)
 
     scale, x_offset, y_offset = calcule_parametres(x_min_merc, y_min_merc, x_max_merc, y_max_merc, 0, 0, width, height)
-    print(scale, x_offset, y_offset)
+    #print(scale, x_offset, y_offset)
     departments_mercator = wgs_to_mercator(points)
     placed_departments = place_all_points(departments_mercator, scale, x_offset, y_offset, width, height)
     #print(departments_mercator == placed_departments)
@@ -429,14 +431,32 @@ def get_data_from_csv(filepath: str) -> dict:
     departements["headers"] = headers
     return departements
 
+GLOBAL_DEPARTEMENTS = get_data_from_csv(CSV_DATA_TARGET)
 
 def get_departement(departement: str) -> dict | None:
-    res = get_data_from_csv(CSV_DATA_TARGET)
-    if departement in res.keys():
-        return res[departement]
+    if departement in GLOBAL_DEPARTEMENTS.keys():
+        return GLOBAL_DEPARTEMENTS[departement]
     return None
 
+def get_index(s: str, c: str) -> int:
+    i = 0
+    while c != s[i]:
+        i+=1
+        
+    return i
 
+def add_ile(num_dep: str, num_ile = '1'):
+    """
+    Modifie GLOBAL_DEPARTEMENT pour rajouter l'ile
+    """
+    numero = int(num_ile)
+    num_ile = f"{num_dep}i{numero}"
+    while num_ile in GLOBAL_DEPARTEMENTS:
+        numero += 1
+        num_ile = f"{num_dep}i{numero}"
+    
+    GLOBAL_DEPARTEMENTS[num_ile] = GLOBAL_DEPARTEMENTS[num_dep]
+    print(f"nouvelle ile pour le {num_dep}: ile numero {numero} ({num_ile})")
 
 
 BLEU = "#42009E"
@@ -495,42 +515,3 @@ def get_couleur(val: float, valeur_min: float, valeur_max: float, couleurs: list
 
 
 HEADER_INDEX_POP = 5
-
-
-def main():
-    headers = get_departement("headers")
-    
-    departement = get_departement("75")
-    print(departement["nom_dep"])
-
-
-    epoques = headers[5:]
-    for epoque in epoques:
-        couleur = get_couleur(int(departement[epoque]), get_population_max(epoque), get_population_min(epoque), PALETTE_COULEURS)
-        print(
-            f"{epoque = }"
-            f"population: {departement[epoque]}, couleur = {couleur}"
-        )
-
-
-
-    print("=" * 100)
-
-
-    departement = get_departement("94")
-    print(departement["nom_dep"])
-
-
-    epoques = headers[5:]
-    for epoque in epoques:
-        couleur = get_couleur(int(departement[epoque]), get_population_max(epoque), get_population_min(epoque), PALETTE_COULEURS)
-        print(
-            f"{epoque = }"
-            f"population: {departement[epoque]}, couleur = {couleur}"
-        )
-
-
-
-
-if __name__ == "__main__":
-    main()
