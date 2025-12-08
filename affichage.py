@@ -9,10 +9,19 @@ hauteur = 900
 
 
 def dessiner_legende():
-    xo = largeur - 40
-    yo = 20
-    ho = hauteur - 40
-    fltk.rectangle(ax=xo, ay=yo, bx=xo+ho, by=yo+ho, couleur = 'black', remplissage='red', epaisseur=5)
+    taille_x = 100
+    taille_y = hauteur // len(PALETTE_COULEURS)
+    for i, couleur in enumerate(PALETTE_COULEURS):
+        ax=largeur - taille_x
+        ay=taille_y * max(1, i), 
+        bx=largeur
+        by=(taille_y**2) * i,
+            
+        fltk.texte(ax, ay, "oe")
+        fltk.rectangle(
+            ax, ay, bx, by,
+            couleur = "black", remplissage=couleur, epaisseur=1
+        )
 
 def get_index_str_in_lst(lst, string) -> int:
     index = 0
@@ -27,26 +36,6 @@ def afficher_carte_coloree(file_name, epoque: str = "p21_pop"):
     departements_shp = get_mercator_from_shp(file_name, (largeur, hauteur))
     headers = get_departement("headers")
 
-<<<<<<< HEAD
-    for department in departments:
-        
-        if department == "isles":
-            print(departments[department])
-            for isle in departments[department][1]:
-                #points = departments["isles"][1]
-                points = isle
-                print(points)
-                fltk.polygone(points, couleur = "black", remplissage = "blue", epaisseur = 1)
-        #print(points)
-        else:
-            print(departments[department])
-            points = departments[department][1]
-            fltk.polygone(points, couleur = "black", remplissage = "blue", epaisseur = 1)
-    
-    
-    
-    
-=======
     pop_max = get_population_max(epoque)
     pop_min = get_population_min(epoque)
 
@@ -57,7 +46,6 @@ def afficher_carte_coloree(file_name, epoque: str = "p21_pop"):
         print(col_dep)
 
         fltk.polygone(points, couleur = "black", remplissage = col_dep, epaisseur = 1)
->>>>>>> 33c1b05dcc404c2c453dc433c0781f0514a0159a
     
     
     
