@@ -154,7 +154,6 @@ def get_points(sf, outremers= False) -> typing.Dict[str, int]:
     departments : typing.Dict[str, typing.List[str, typing.List[typing.Tuple[int, int]]]] = {
 
     }
-    departments["isles"] = ["isles", [ ]]
     sf_shapes = sf.shapes()
 
     for i in range(len(sf_shapes)):
@@ -162,38 +161,32 @@ def get_points(sf, outremers= False) -> typing.Dict[str, int]:
         curr_shape = sf.shape(i)
         curr_shape_parts = curr_shape.parts
         #if not(outremers) and len(curr_record[0]) < 3: departments[curr_record[0]] = [curr_record[1], sf.shape(i).points]
-        if outremers and len(curr_record[0]) >= 3: continue
-    #     if curr_shape_parts == [0]: departments[curr_record[0]] = [curr_record[1], sf.shape(i).points]
-    #     else:
-    #         curr_isles_polygons = [ ]
-    #         curr_shape_points = curr_shape.points
-    #         for i in range(1, len(curr_shape_parts)):
-    #             start_idx, end_idx = curr_shape_parts[i-1], curr_shape_parts[i]
-    #             curr_isles_polygons.append(curr_shape_points[start_idx: end_idx])
+        if (curr_record[0][0:2] != "69") and outremers and len(curr_record[0]) >= 3: continue
 
-    #         curr_isle = {curr_record[0], curr_isles_polygons}
-
-    #         departments["isles"].append(curr_isle)
-
-
-
-
-    # return departments
-        if curr_shape_parts == [0]: departments[curr_record[0]] = [curr_record[1], sf.shape(i).points]
+        elif len(curr_shape_parts) <= 1: 
+            print("full department, no isle", curr_record[0])
+            departments[curr_record[0]] = [curr_record[1], sf.shape(i).points]
+            if curr_record[0][0:2] == "69": print("69 RHONE", curr_shape_parts)
         else:
-            curr_isles_polygons = [ ]
+            #print("ISLEEEEE", curr_shape_parts)
             curr_shape_points = curr_shape.points
-            for i in range(1, len(curr_shape_parts)):
-                start_idx, end_idx = curr_shape_parts[i-1], curr_shape_parts[i]
-                curr_isles_polygons.append(curr_shape_points[start_idx: end_idx])
+            #for k in range(1, len(curr_shape_parts)):
+            k = 0
+            while k < len(curr_shape_parts) -1:
+                
+                curr_department_id, curr_department_name = curr_record[0] + "_isle" + str(k), curr_record[1] + "_isle" + str(k)
+                print("isle id, isle name",  curr_department_id, curr_department_name)
+                if curr_record[0][0:2] == "69":
+                    print("69 RHONE", curr_shape_parts)
+                    #print("k, record k", k, curr_shape_parts[k-1], curr_shape_parts[k])
+                #start_idx, end_idx = curr_shape_parts[k-1], curr_shape_parts[k]
+                start_idx, end_idx = curr_shape_parts[k], curr_shape_parts[k+1]
+                curr_points = curr_shape_points[start_idx: end_idx]
+                #print("curr points of ISLEEEE", curr_points)
+                departments[curr_department_id] = [curr_department_name, curr_points]
+                k = k + 1
 
-            #curr_isle = {curr_record[0], curr_isles_polygons}
-
-            departments["isles"].append(curr_isles_polygons)
-
-
-
-
+        
     return departments
 
 
@@ -243,7 +236,6 @@ def get_mercator_from_shp_bis(file_name, map_size, map_scale=0.00005):
 
     mercator_points = convert_wgs_to_mercator(points, center= map_center, scale= scale, map_scale=map_size, distance=distance)
     return mercator_points
-
 
 def try_stuff(file_name, map_size):
     sf = import_shp(file_name)
@@ -306,7 +298,6 @@ def wgs_to_mercator_bis(departments, scale, x_offset, y_offset):
     #map_scale = (map_scale[0] * map_scale[0], map_scale[1] * map_scale[1])
 
     for department in departments:
-
         new_points : typing.List[typing.Tuple[float, float]] = [ ]
         for curr_point in departments[department][1]:
             merc_curr_point = mercator(curr_point[0], curr_point[1])
@@ -325,23 +316,12 @@ def wgs_to_mercator(departments):
     #map_scale = (map_scale[0] * map_scale[0], map_scale[1] * map_scale[1])
 
     for department in departments:
-        if department == "isles":
-            new_isles : typing.List[typing.Tuple[float, float]] = [ ]
-            for isle in departments[department][1]:
-                print(isle)
-                new_points : typing.List[typing.Tuple[float, float]] = [ ]
-                for curr_point in isle:
-                    print(curr_point)
-                    merc_curr_point = mercator(curr_point[0], curr_point[1])
-                    new_points.append(merc_curr_point)
-                new_isles.append(new_points)
-            departments_mercator["isles"] = ["isles", new_isles]
-        else:
-            new_points : typing.List[typing.Tuple[float, float]] = [ ]
-            for curr_point in departments[department][1]:
-                merc_curr_point = mercator(curr_point[0], curr_point[1])
-                new_points.append(merc_curr_point)
-            departments_mercator[department] = [ departments[department][0], new_points ]
+        new_points : typing.List[typing.Tuple[float, float]] = [ ]
+        for curr_point in departments[department][1]:
+            merc_curr_point = mercator(curr_point[0], curr_point[1])
+            #merc_curr_point = -merc_curr_point_bis[0], merc_curr_point_bis[1]
+            new_points.append(merc_curr_point)
+        departments_mercator[department] = [ departments[department][0], new_points ]
 
     return departments_mercator
 
@@ -351,23 +331,12 @@ def place_all_points(departments, scale, x_offset, y_offset, width, height):
 
     }
     for department in departments:
-        if department == "isles":
-            new_isles : typing.List[typing.Tuple[float, float]] = [ ]
-            for isle in departments[department][1]:
-                new_points : typing.List[typing.Tuple[float, float]] = [ ]
-                for curr_point in isle:
-                    new_point = place_point(curr_point[0], curr_point[1], scale, x_offset, y_offset)
-                    new_point = new_point[0], height + new_point[1]
-                    new_points.append(new_point)
-                new_isles.append(new_points)
-            new_departments["isles"] = ["isles", new_isles]
-        else:
-            new_points : typing.List[typing.Tuple[float, float]] = [ ]
-            for curr_point in departments[department][1]:
-                new_point = place_point(curr_point[0], curr_point[1], scale, x_offset, y_offset)
-                new_point = new_point[0], height + new_point[1]
-                new_points.append(new_point)
-            new_departments[department] = [ departments[department][0], new_points ]
+        new_points : typing.List[typing.Tuple[float, float]] = [ ]
+        for curr_point in departments[department][1]:
+            new_point = place_point(curr_point[0], curr_point[1], scale, x_offset, y_offset)
+            new_point = new_point[0], height + new_point[1]
+            new_points.append(new_point)
+        new_departments[department] = [ departments[department][0], new_points ]
     return new_departments
 
 
@@ -399,16 +368,17 @@ def get_mercator_from_shp(file_name, map_size):
     # prep_corners = points["29"][1], points["59"][1], points["2B"][1], points["2A"][1]
     # print(prep_corners[0])
     # corners = calculate_box(prep_corners) # west, south, east,  north
-
     #bottom_left, up_right = (corners[0], corners[1]), (corners[2], corners[3])
-
-    #(x_min, y_min), (x_max, y_max) = (corners[0], corners[3]), (corners[2], corners[1])
+    # (x_min, y_min), (x_max, y_max) = (corners[0], corners[3]), (corners[2], corners[1])
     #print(points)
-    #x_min, y_min, x_max, y_max = -0.375, 45.375, 2.125, 43.125
-    x_min, y_min, x_max, y_max = -5.0, 52.0, 10.0, 42.0 
+
+    #x_min, y_min, x_max, y_max = -5.0, 52.0, 10.0, 42.0 
+    #x_min, y_min, x_max, y_max = -5.0, 42.0, 10.0, 52.0 
+    x_min, y_min, x_max, y_max = -5.141276481967004, 41.33319101116324, 9.560052982781922, 51.08899110023721
 
     width, height = map_size[0], map_size[1]
     box_x_min, box_y_min, box_x_max, box_y_max = sf.bbox
+    #x_min, y_min, x_max, y_max = sf.bbox
 
     if not(outremers):
         if box_x_min <= x_min: x_min = box_x_min
@@ -417,12 +387,16 @@ def get_mercator_from_shp(file_name, map_size):
         if y_max <= box_y_max: y_max = box_y_max
 
     (x_min_merc, y_min_merc), (x_max_merc, y_max_merc) = mercator(x_min, y_min), mercator(x_max, y_max)
+    print(x_min, y_min, x_max, y_max)
+
 
     scale, x_offset, y_offset = calcule_parametres(x_min_merc, y_min_merc, x_max_merc, y_max_merc, 0, 0, width, height)
-    print(scale, x_offset, y_offset)
+    print("parametre", scale, x_offset, y_offset)
+    print(x_min_merc, y_min_merc, x_max_merc, y_max_merc)
+    # -5.0 61.08656629615306 10.0 46.36186715616591
     departments_mercator = wgs_to_mercator(points)
     placed_departments = place_all_points(departments_mercator, scale, x_offset, y_offset, width, height)
-    #print(departments_mercator == placed_departments)
+    print("check", departments_mercator == placed_departments)
 
     return placed_departments
 
@@ -446,7 +420,9 @@ def get_mercator_from_shp(file_name, map_size):
 
 
 
-#sf = shapefile.Reader("departements-20180101-shp/departements-20180101.shp")
+#sf = shapefile.Reader("departements-20180101/departements-20180101.shp")
+#print(get_mercator_from_shp("departements-20180101/departements-20180101.shp", (1200, 500)))
+#get_mercator_from_shp("departements-20180101/departements-20180101.shp", (1200, 500))
 #print(sf.records())
 #print(sf.bbox)
 #print(get_points(sf))
@@ -541,8 +517,27 @@ def get_population_min(cle_annee = "p21_pop") -> int:
 
     return curr_min
 
+# source: https://coolors.co/palette/ff4800-ff5400-ff6000-ff6d00-ff7900-ff8500-ff9100-ff9e00-ffaa00-ffb600
+# PALETTE_COULEURS = [
+#     "#03071E",
+#     "#370617",
+#     "#6A040F",
+#     "#9D0208",
+#     "#D00000",
+#     "#DC2F02",
+#     "#E85D04",
+#     "#F48C06",
+#     "#FAA307",
+#     "#FFBA08"
+# ]
+
+
 # source: https://coolors.co/
+
+
 PALETTE_COULEURS = ["#370617","#6a040f","#9d0208","#d00000","#dc2f02","#e85d04","#f48c06","#faa307","#ffba08"]
+
+
 PALETTE_COULEURS.reverse()
 
 def get_couleur(val: float, valeur_min: float, valeur_max: float, couleurs: list = None) -> str:
@@ -550,6 +545,9 @@ def get_couleur(val: float, valeur_min: float, valeur_max: float, couleurs: list
     normalise *= len(couleurs)
     normalise = int(normalise)
     normalise = min(normalise, len(couleurs)-1)
+
+    # if couleurs == None:
+    #     couleurs = [JAUNE, ORANGE, ROSE, VIOLET, BLEU]
 
     return couleurs[normalise]
 

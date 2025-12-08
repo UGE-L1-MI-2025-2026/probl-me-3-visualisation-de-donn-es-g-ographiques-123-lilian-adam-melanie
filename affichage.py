@@ -36,37 +36,28 @@ def afficher_carte_coloree(file_name, epoque: str = "p21_pop"):
     departements_shp = get_mercator_from_shp(file_name, (largeur, hauteur))
     headers = get_departement("headers")
 
-<<<<<<< HEAD
-    for department in departments:
-        
-        if department == "isles":
-            print(departments[department])
-            for isle in departments[department][1]:
-                #points = departments["isles"][1]
-                points = isle
-                print(points)
-                fltk.polygone(points, couleur = "black", remplissage = "blue", epaisseur = 1)
-        #print(points)
-        else:
-            print(departments[department])
-            points = departments[department][1]
-            fltk.polygone(points, couleur = "black", remplissage = "blue", epaisseur = 1)
-    
-    
-    
-    
-=======
     pop_max = get_population_max(epoque)
     pop_min = get_population_min(epoque)
 
     for num_dep in departements_shp:
         points = departements_shp[num_dep][1]
+        #print("num_dep, points", num_dep, points)
+        num_dep_save = num_dep
+
+        for i in range(len(num_dep)):
+            if num_dep[i] == "_":
+                num_dep = num_dep[0:i]
+                break
+
+        if num_dep[0:2] == "69":
+            num_dep = "69"
+
         dep_pop = int(get_departement(num_dep)[epoque])
         col_dep = get_couleur(dep_pop, pop_min, pop_max, PALETTE_COULEURS)
-        print(col_dep)
+        #col_dep = "white"
+        #print(col_dep)
 
         fltk.polygone(points, couleur = "black", remplissage = col_dep, epaisseur = 1)
->>>>>>> 33c1b05dcc404c2c453dc433c0781f0514a0159a
     
     
     
@@ -77,7 +68,8 @@ def afficher_carte_coloree(file_name, epoque: str = "p21_pop"):
     )
 
 fltk.cree_fenetre(largeur,hauteur, affiche_repere=True)
-afficher_carte_coloree("departements-20180101-shp/departements-20180101")
+#afficher_carte_coloree("departements-20180101-shp/departements-20180101")
+afficher_carte_coloree("departements-20180101/departements-20180101.shp")
 print("done")
 dessiner_legende()
 
@@ -89,6 +81,5 @@ while True:
         break
 
 fltk.ferme_fenetre
-
 
 
