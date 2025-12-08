@@ -34,12 +34,13 @@ def get_index_str_in_lst(lst, string) -> int:
 
 def afficher_carte_coloree(file_name, epoque: str = "p21_pop"):
     departements_shp = get_mercator_from_shp(file_name, (largeur, hauteur))
-    headers = get_departement("headers")
 
     pop_max = get_population_max(epoque)
     pop_min = get_population_min(epoque)
 
+    count = 0
     for num_dep in departements_shp:
+        #print(f"{num_dep = }")
         points = departements_shp[num_dep][1]
         #print("num_dep, points", num_dep, points)
         num_dep_save = num_dep
@@ -54,6 +55,7 @@ def afficher_carte_coloree(file_name, epoque: str = "p21_pop"):
 
         dep_pop = int(get_departement(num_dep)[epoque])
         col_dep = get_couleur(dep_pop, pop_min, pop_max, PALETTE_COULEURS)
+<<<<<<< HEAD
         #col_dep = "white"
         #print(col_dep)
 
@@ -81,5 +83,14 @@ while True:
         break
 
 fltk.ferme_fenetre
+=======
+        #print(col_dep)
 
+        fltk.polygone(points, couleur = "black", remplissage = col_dep, epaisseur = 1)
+        count += 1
+
+    print(f"departements affichés: {count}")
+>>>>>>> f3f7bb6d71ebaa7d089edc1fed3cc609ff1d1ad3
+
+#print(GLOBAL_DEPARTEMENTS)
 
