@@ -3,21 +3,35 @@ from calculs import *
 
 largeur = 1200
 hauteur = 900
+HEADER_INDEX_POP = 5
 
 #chemin_dep = 'departements-20180101-shp/departements-20180101.shp'
 #chemin_pop = ''
 
 
-def dessiner_legende():
+def dessiner_legende(epoque: str = "p21_pop"):
     taille_x = 100
     taille_y = hauteur // len(PALETTE_COULEURS)
+    ax=largeur - taille_x
+    ay=taille_y
+    bx=largeur
+    by=(taille_y**2)
+
+    headers = get_departement("headers")
+    epoques = headers[HEADER_INDEX_POP:]
+    for epoque in epoques:
+        pop_min = get_population_min(epoque)
+        pop_max = get_population_max(epoque)
     for i, couleur in enumerate(PALETTE_COULEURS):
         ax=largeur - taille_x
-        ay=taille_y * max(1, i), 
+        ay=taille_y * max(0, i)
         bx=largeur
-        by=(taille_y**2) * i,
+        by=(taille_y**2) * i
+
+        moy = (pop_max-pop_min)//8
+        pop_année = pop_min + moy*i
             
-        fltk.texte(ax, ay, "oe")
+        fltk.texte(ax-140, ay, pop_année)
         fltk.rectangle(
             ax, ay, bx, by,
             couleur = "black", remplissage=couleur, epaisseur=1
@@ -48,12 +62,6 @@ def afficher_carte_coloree(file_name, epoque: str = "p21_pop"):
         fltk.polygone(points, couleur = "black", remplissage = col_dep, epaisseur = 1)
     
     
-    
-    fltk.polygone([(2.3923284961351237, 48.335929161584076), (2.393003669902668, 48.336290983108846), (2.3940130169559044, 48.3356802622364), (2.3951130129955068, 48.3349251161054)],#points_dep, #points qui délimitent le département
-    couleur='black',
-    remplissage = 'blue', # pour plus tard : remp_coul variable change de couleurs en fonction des données
-    epaisseur = 5
-    )
 
 fltk.cree_fenetre(largeur,hauteur, affiche_repere=True)
 afficher_carte_coloree("departements-20180101-shp/departements-20180101")

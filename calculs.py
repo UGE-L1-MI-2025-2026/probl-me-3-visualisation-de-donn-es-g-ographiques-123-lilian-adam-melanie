@@ -485,7 +485,7 @@ def get_population_min(cle_annee = "p21_pop") -> int:
 PALETTE_COULEURS = ["#370617","#6a040f","#9d0208","#d00000","#dc2f02","#e85d04","#f48c06","#faa307","#ffba08"]
 PALETTE_COULEURS.reverse()
 
-def get_couleur(val: float, valeur_min: float, valeur_max: float, couleurs: list = None) -> str:
+def get_couleur(val: float, valeur_min: float, valeur_max: float, couleurs: list = PALETTE_COULEURS) -> str:
     normalise =  (val - valeur_min) / (valeur_max - valeur_min)
     normalise *= len(couleurs)
     normalise = int(normalise)
