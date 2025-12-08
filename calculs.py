@@ -541,15 +541,28 @@ def get_population_min(cle_annee = "p21_pop") -> int:
 
     return curr_min
 
-# source: https://coolors.co/
-PALETTE_COULEURS = ["#370617","#6a040f","#9d0208","#d00000","#dc2f02","#e85d04","#f48c06","#faa307","#ffba08"]
-PALETTE_COULEURS.reverse()
+# source: https://coolors.co/palette/ff4800-ff5400-ff6000-ff6d00-ff7900-ff8500-ff9100-ff9e00-ffaa00-ffb600
+PALETTE_COULEURS = [
+    "#03071E",
+    "#370617",
+    "#6A040F",
+    "#9D0208",
+    "#D00000",
+    "#DC2F02",
+    "#E85D04",
+    "#F48C06",
+    "#FAA307",
+    "#FFBA08"
+]
 
 def get_couleur(val: float, valeur_min: float, valeur_max: float, couleurs: list = None) -> str:
     normalise =  (val - valeur_min) / (valeur_max - valeur_min)
     normalise *= len(couleurs)
     normalise = int(normalise)
     normalise = min(normalise, len(couleurs)-1)
+
+    if couleurs == None:
+        couleurs = [JAUNE, ORANGE, ROSE, VIOLET, BLEU]
 
     return couleurs[normalise]
 

@@ -9,19 +9,10 @@ hauteur = 900
 
 
 def dessiner_legende():
-    taille_x = 100
-    taille_y = hauteur // len(PALETTE_COULEURS)
-    for i, couleur in enumerate(PALETTE_COULEURS):
-        ax=largeur - taille_x
-        ay=taille_y * max(1, i), 
-        bx=largeur
-        by=(taille_y**2) * i,
-            
-        fltk.texte(ax, ay, "oe")
-        fltk.rectangle(
-            ax, ay, bx, by,
-            couleur = "black", remplissage=couleur, epaisseur=1
-        )
+    xo = largeur - 40
+    yo = 20
+    ho = hauteur - 40
+    fltk.rectangle(ax=xo, ay=yo, bx=xo+ho, by=yo+ho, couleur = 'black', remplissage='red', epaisseur=5)
 
 def get_index_str_in_lst(lst, string) -> int:
     index = 0
