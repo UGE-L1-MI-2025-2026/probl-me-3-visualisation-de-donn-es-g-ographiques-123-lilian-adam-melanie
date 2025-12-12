@@ -140,7 +140,7 @@ def import_shp(file_name) -> shapefile:
 
     return sf
 
-def get_points(sf, outremers= False) -> typing.Dict[str, int]:
+def get_points(sf, outremers= False) -> typing.Dict[str, List[str]]:
     """
     Parameter:
         sf : shapefile = content of a shapefile file
@@ -157,9 +157,11 @@ def get_points(sf, outremers= False) -> typing.Dict[str, int]:
     sf_shapes = sf.shapes()
 
     for i in range(len(sf_shapes)):
+        curr_shape = sf.shape(i)
+        curr_shape_parts = curr_shape.parts
+
         curr_record = sf.record(i)
         #if not(outremers) and len(curr_record[0]) < 3: departments[curr_record[0]] = [curr_record[1], sf.shape(i).points]
-<<<<<<< HEAD
         if (curr_record[0][0:2] != "69") and outremers and len(curr_record[0]) >= 3: continue
 
         elif len(curr_shape_parts) <= 1: 
@@ -185,10 +187,6 @@ def get_points(sf, outremers= False) -> typing.Dict[str, int]:
                 departments[curr_department_id] = [curr_department_name, curr_points]
                 k = k + 1
 
-=======
-        if outremers and len(curr_record[0]) >= 3: continue
-        else: departments[curr_record[0]] = [curr_record[1], sf.shape(i).points]
->>>>>>> f3f7bb6d71ebaa7d089edc1fed3cc609ff1d1ad3
         
     return departments
 
@@ -240,11 +238,7 @@ def get_mercator_from_shp_bis(file_name, map_size, map_scale=0.00005):
     mercator_points = convert_wgs_to_mercator(points, center= map_center, scale= scale, map_scale=map_size, distance=distance)
     return mercator_points
 
-<<<<<<< HEAD
-=======
-
 """
->>>>>>> f3f7bb6d71ebaa7d089edc1fed3cc609ff1d1ad3
 def try_stuff(file_name, map_size):
     sf = import_shp(file_name)
     points = get_points(sf)
@@ -328,10 +322,6 @@ def wgs_to_mercator(departments):
         new_points : typing.List[typing.Tuple[float, float]] = [ ]
         for curr_point in departments[department][1]:
             merc_curr_point = mercator(curr_point[0], curr_point[1])
-<<<<<<< HEAD
-            #merc_curr_point = -merc_curr_point_bis[0], merc_curr_point_bis[1]
-=======
->>>>>>> f3f7bb6d71ebaa7d089edc1fed3cc609ff1d1ad3
             new_points.append(merc_curr_point)
         departments_mercator[department] = [ departments[department][0], new_points ]
 
@@ -376,26 +366,14 @@ def get_mercator_from_shp(file_name, map_size):
 
     outremers = True
     sf = import_shp(file_name)
-    points = get_points(sf, outremers)
-<<<<<<< HEAD
-    # prep_corners = points["29"][1], points["59"][1], points["2B"][1], points["2A"][1]
-    # print(prep_corners[0])
-    # corners = calculate_box(prep_corners) # west, south, east,  north
-    #bottom_left, up_right = (corners[0], corners[1]), (corners[2], corners[3])
-    # (x_min, y_min), (x_max, y_max) = (corners[0], corners[3]), (corners[2], corners[1])
-    #print(points)
+    points = get_points(sf, outremers=True)
 
-    #x_min, y_min, x_max, y_max = -5.0, 52.0, 10.0, 42.0 
-    #x_min, y_min, x_max, y_max = -5.0, 42.0, 10.0, 52.0 
-    x_min, y_min, x_max, y_max = -5.141276481967004, 41.33319101116324, 9.560052982781922, 51.08899110023721
-=======
-    prep_corners = points["29"][1], points["59"][1], points["2B"][1], points["2A"][1]
+    prep_corners = points["29_isle0"][1], points["59_isle0"][1], points["2B_isle0"][1], points["2A_isle0"][1]
     #print(prep_corners[0])
     corners = calculate_box(prep_corners) # west, south, east,  north
     #bottom_left, up_right = (corners[0], corners[1]), (corners[2], corners[3])
     (x_min, y_min), (x_max, y_max) = (corners[0], corners[3]), (corners[2], corners[1])
     #print(points)
->>>>>>> f3f7bb6d71ebaa7d089edc1fed3cc609ff1d1ad3
 
     width, height = map_size[0], map_size[1]
     box_x_min, box_y_min, box_x_max, box_y_max = sf.bbox
@@ -412,13 +390,7 @@ def get_mercator_from_shp(file_name, map_size):
 
 
     scale, x_offset, y_offset = calcule_parametres(x_min_merc, y_min_merc, x_max_merc, y_max_merc, 0, 0, width, height)
-<<<<<<< HEAD
-    print("parametre", scale, x_offset, y_offset)
-    print(x_min_merc, y_min_merc, x_max_merc, y_max_merc)
-    # -5.0 61.08656629615306 10.0 46.36186715616591
-=======
     #print(scale, x_offset, y_offset)
->>>>>>> f3f7bb6d71ebaa7d089edc1fed3cc609ff1d1ad3
     departments_mercator = wgs_to_mercator(points)
     placed_departments = place_all_points(departments_mercator, scale, x_offset, y_offset, width, height)
     print("check", departments_mercator == placed_departments)

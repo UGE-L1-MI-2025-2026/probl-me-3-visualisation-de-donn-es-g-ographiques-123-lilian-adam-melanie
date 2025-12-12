@@ -49,48 +49,20 @@ def afficher_carte_coloree(file_name, epoque: str = "p21_pop"):
             if num_dep[i] == "_":
                 num_dep = num_dep[0:i]
                 break
-
-        if num_dep[0:2] == "69":
+        
+        if num_dep == "69D" or num_dep == "69M":
             num_dep = "69"
+
+        print(f"aaa{num_dep = }")
+        print(f"aaa{get_departement(num_dep) = }")
 
         dep_pop = int(get_departement(num_dep)[epoque])
         col_dep = get_couleur(dep_pop, pop_min, pop_max, PALETTE_COULEURS)
-<<<<<<< HEAD
-        #col_dep = "white"
-        #print(col_dep)
-
-        fltk.polygone(points, couleur = "black", remplissage = col_dep, epaisseur = 1)
-    
-    
-    
-    fltk.polygone([(2.3923284961351237, 48.335929161584076), (2.393003669902668, 48.336290983108846), (2.3940130169559044, 48.3356802622364), (2.3951130129955068, 48.3349251161054)],#points_dep, #points qui délimitent le département
-    couleur='black',
-    remplissage = 'blue', # pour plus tard : remp_coul variable change de couleurs en fonction des données
-    epaisseur = 5
-    )
-
-fltk.cree_fenetre(largeur,hauteur, affiche_repere=True)
-#afficher_carte_coloree("departements-20180101-shp/departements-20180101")
-afficher_carte_coloree("departements-20180101/departements-20180101.shp")
-print("done")
-dessiner_legende()
-
-while True:
-    fltk.mise_a_jour()
-    event = fltk.donne_ev()
-    type_event = fltk.type_ev(event)
-    if type_event == "Quitte":
-        break
-
-fltk.ferme_fenetre
-=======
         #print(col_dep)
 
         fltk.polygone(points, couleur = "black", remplissage = col_dep, epaisseur = 1)
         count += 1
 
     print(f"departements affichés: {count}")
->>>>>>> f3f7bb6d71ebaa7d089edc1fed3cc609ff1d1ad3
 
 #print(GLOBAL_DEPARTEMENTS)
-
