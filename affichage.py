@@ -3,21 +3,35 @@ from calculs import *
 
 largeur = 1200
 hauteur = 900
+HEADER_INDEX_POP = 5
 
 #chemin_dep = 'departements-20180101-shp/departements-20180101.shp'
 #chemin_pop = ''
 
 
-def dessiner_legende():
+def dessiner_legende(epoque: str = "p21_pop"):
     taille_x = 100
     taille_y = hauteur // len(PALETTE_COULEURS)
+    ax=largeur - taille_x
+    ay=taille_y
+    bx=largeur
+    by=(taille_y**2)
+
+    headers = get_departement("headers")
+    epoques = headers[HEADER_INDEX_POP:]
+    for epoque in epoques:
+        pop_min = get_population_min(epoque)
+        pop_max = get_population_max(epoque)
     for i, couleur in enumerate(PALETTE_COULEURS):
         ax=largeur - taille_x
-        ay=taille_y * max(1, i), 
+        ay=taille_y * max(0, i)
         bx=largeur
-        by=(taille_y**2) * i,
+        by=(taille_y**2) * i
+
+        moy = (pop_max-pop_min)//8
+        pop_année = pop_min + moy*i
             
-        fltk.texte(ax, ay, "oe")
+        fltk.texte(ax-140, ay, pop_année)
         fltk.rectangle(
             ax, ay, bx, by,
             couleur = "black", remplissage=couleur, epaisseur=1
@@ -58,11 +72,10 @@ def afficher_carte_coloree(file_name, epoque: str = "p21_pop"):
 
         dep_pop = int(get_departement(num_dep)[epoque])
         col_dep = get_couleur(dep_pop, pop_min, pop_max, PALETTE_COULEURS)
+
+        #col_dep = "white"
         #print(col_dep)
 
         fltk.polygone(points, couleur = "black", remplissage = col_dep, epaisseur = 1)
-        count += 1
-
-    print(f"departements affichés: {count}")
-
-#print(GLOBAL_DEPARTEMENTS)
+    
+    
