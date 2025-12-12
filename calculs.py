@@ -140,7 +140,7 @@ def import_shp(file_name) -> shapefile:
 
     return sf
 
-def get_points(sf, outremers= False) -> typing.Dict[str, int]:
+def get_points(sf, outremers= False) -> typing.Dict[str, List[str]]:
     """
     Parameter:
         sf : shapefile = content of a shapefile file
@@ -157,12 +157,14 @@ def get_points(sf, outremers= False) -> typing.Dict[str, int]:
     sf_shapes = sf.shapes()
 
     for i in range(len(sf_shapes)):
+        curr_shape = sf.shape(i)
+        curr_shape_parts = curr_shape.parts
+
         curr_record = sf.record(i)
         curr_shape = sf.shape(i)
         curr_shape_parts = curr_shape.parts
         curr_shape_points = curr_shape.points
         #if not(outremers) and len(curr_record[0]) < 3: departments[curr_record[0]] = [curr_record[1], sf.shape(i).points]
-
         if (curr_record[0][0:2] != "69") and outremers and len(curr_record[0]) >= 3: continue
 
         elif len(curr_shape_parts) <= 1: 
@@ -271,9 +273,6 @@ def get_mercator_from_shp_bis(file_name, map_size, map_scale=0.00005):
     return mercator_points
 
 
-
-"""
-
 def try_stuff(file_name, map_size):
     sf = import_shp(file_name)
     points = get_points(sf)
@@ -281,8 +280,7 @@ def try_stuff(file_name, map_size):
     bottom_left, up_right = (corners[0], corners[1]), (corners[2], corners[3])
     distance_bl, distance_ur = get_distance((0, 0), bottom_left), get_distance((map_size, up_right))
 
-"""
-"""
+
 def do_everything(departments, box, map_size):
     departments_mercator : typing.Dict[str, typing.List[str, typing.List[typing.Tuple[float, float]]]] = {
 
@@ -301,7 +299,7 @@ def do_everything(departments, box, map_size):
         departments_mercator[department] = [ departments[department][0], new_points ]
 
     return departments_mercator
-"""
+
 
 from math import log, tan, pi, radians, degrees
 
@@ -424,7 +422,6 @@ def get_mercator_from_shp(file_name, map_size):
     #bottom_left, up_right = (corners[0], corners[1]), (corners[2], corners[3])
     #(x_min, y_min), (x_max, y_max) = (corners[0], corners[3]), (corners[2], corners[1])
     #print(points)
-
 
     width, height = map_size[0], map_size[1]
     box_x_min, box_y_min, box_x_max, box_y_max = sf.bbox
@@ -631,7 +628,7 @@ PALETTE_COULEURS = ["#370617","#6a040f","#9d0208","#d00000","#dc2f02","#e85d04",
 
 PALETTE_COULEURS.reverse()
 
-def get_couleur(val: float, valeur_min: float, valeur_max: float, couleurs: list = None) -> str:
+def get_couleur(val: float, valeur_min: float, valeur_max: float, couleurs: list = PALETTE_COULEURS) -> str:
     normalise =  (val - valeur_min) / (valeur_max - valeur_min)
     normalise *= len(couleurs)
     normalise = int(normalise)
