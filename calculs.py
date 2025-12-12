@@ -161,31 +161,65 @@ def get_points(sf, outremers= False) -> typing.Dict[str, List[str]]:
         curr_shape_parts = curr_shape.parts
 
         curr_record = sf.record(i)
+        curr_shape = sf.shape(i)
+        curr_shape_parts = curr_shape.parts
+        curr_shape_points = curr_shape.points
         #if not(outremers) and len(curr_record[0]) < 3: departments[curr_record[0]] = [curr_record[1], sf.shape(i).points]
         if (curr_record[0][0:2] != "69") and outremers and len(curr_record[0]) >= 3: continue
 
         elif len(curr_shape_parts) <= 1: 
-            print("full department, no isle", curr_record[0])
-            departments[curr_record[0]] = [curr_record[1], sf.shape(i).points]
+            #print("full department, no isle", curr_record[0])
+            departments[curr_record[0]] = [curr_record[1], curr_shape_points]
             if curr_record[0][0:2] == "69": print("69 RHONE", curr_shape_parts)
         else:
             #print("ISLEEEEE", curr_shape_parts)
             curr_shape_points = curr_shape.points
-            #for k in range(1, len(curr_shape_parts)):
+            # for k in range(1, len(curr_shape_parts)):
+            #     curr_department_id, curr_department_name = curr_record[0] + "_isle" + str(k), curr_record[1] + "_isle" + str(k)
+            #     print("isle id, isle name",  curr_department_id, curr_department_name)
+            #     if curr_record[0][0:2] == "69":
+            #         print("69 RHONE", curr_shape_parts)
+            #     start_idx, end_idx = curr_shape_parts[k-1], curr_shape_parts[k]
+            #     curr_points = curr_shape_points[start_idx: end_idx]
+            #     departments[curr_department_id] = [curr_department_name, curr_points]
+
             k = 0
             while k < len(curr_shape_parts) -1:
-                
                 curr_department_id, curr_department_name = curr_record[0] + "_isle" + str(k), curr_record[1] + "_isle" + str(k)
-                print("isle id, isle name",  curr_department_id, curr_department_name)
+                #print("isle id, isle name:", curr_department_id, curr_department_name)
                 if curr_record[0][0:2] == "69":
                     print("69 RHONE", curr_shape_parts)
-                    #print("k, record k", k, curr_shape_parts[k-1], curr_shape_parts[k])
-                #start_idx, end_idx = curr_shape_parts[k-1], curr_shape_parts[k]
                 start_idx, end_idx = curr_shape_parts[k], curr_shape_parts[k+1]
                 curr_points = curr_shape_points[start_idx: end_idx]
-                #print("curr points of ISLEEEE", curr_points)
                 departments[curr_department_id] = [curr_department_name, curr_points]
                 k = k + 1
+            curr_department_id, curr_department_name = curr_record[0] + "_isle" + str(k), curr_record[1] + "_isle" + str(k)
+            curr_points = curr_shape_points[end_idx: len(curr_shape_points)]
+            departments[curr_department_id] = [curr_department_name, curr_points]
+
+
+
+            #k = 0
+            # while k < len(curr_shape_parts) -1:
+                
+            #     curr_department_id, curr_department_name = curr_record[0] + "_isle" + str(k), curr_record[1] + "_isle" + str(k)
+            #     print("isle id, isle name",  curr_department_id, curr_department_name)
+            #     if curr_record[0][0:2] == "69":
+            #         print("69 RHONE", curr_shape_parts)
+            #         #print("k, record k", k, curr_shape_parts[k-1], curr_shape_parts[k])
+            #     #start_idx, end_idx = curr_shape_parts[k-1], curr_shape_parts[k]
+            #     start_idx, end_idx = curr_shape_parts[k], curr_shape_parts[k+1]
+            #     curr_points = curr_shape_points[start_idx: end_idx]
+            #     #print("curr points of ISLEEEE", curr_points)
+            #     departments[curr_department_id] = [curr_department_name, curr_points]
+            #     k = k + 1
+            #curr_department_id, curr_department_name = curr_record[0] + "_isle" + str(k), curr_record[1] + "_isle" + str(k)
+            #curr_points = curr_shape_points[end_idx: len(curr_shape_points)]
+            #departments[curr_department_id] = [curr_department_name, curr_points]
+
+
+        #if outremers and len(curr_record[0]) >= 3: continue
+        #else: departments[curr_record[0]] = [curr_record[1], curr_shape_points]
 
         
     return departments
@@ -238,7 +272,7 @@ def get_mercator_from_shp_bis(file_name, map_size, map_scale=0.00005):
     mercator_points = convert_wgs_to_mercator(points, center= map_center, scale= scale, map_scale=map_size, distance=distance)
     return mercator_points
 
-"""
+
 def try_stuff(file_name, map_size):
     sf = import_shp(file_name)
     points = get_points(sf)
@@ -246,8 +280,7 @@ def try_stuff(file_name, map_size):
     bottom_left, up_right = (corners[0], corners[1]), (corners[2], corners[3])
     distance_bl, distance_ur = get_distance((0, 0), bottom_left), get_distance((map_size, up_right))
 
-"""
-"""
+
 def do_everything(departments, box, map_size):
     departments_mercator : typing.Dict[str, typing.List[str, typing.List[typing.Tuple[float, float]]]] = {
 
@@ -266,7 +299,7 @@ def do_everything(departments, box, map_size):
         departments_mercator[department] = [ departments[department][0], new_points ]
 
     return departments_mercator
-"""
+
 
 from math import log, tan, pi, radians, degrees
 
@@ -322,6 +355,8 @@ def wgs_to_mercator(departments):
         new_points : typing.List[typing.Tuple[float, float]] = [ ]
         for curr_point in departments[department][1]:
             merc_curr_point = mercator(curr_point[0], curr_point[1])
+
+            #merc_curr_point = -merc_curr_point_bis[0], merc_curr_point_bis[1]
             new_points.append(merc_curr_point)
         departments_mercator[department] = [ departments[department][0], new_points ]
 
@@ -366,13 +401,26 @@ def get_mercator_from_shp(file_name, map_size):
 
     outremers = True
     sf = import_shp(file_name)
-    points = get_points(sf, outremers=True)
+    points = get_points(sf, outremers)
 
-    prep_corners = points["29_isle0"][1], points["59_isle0"][1], points["2B_isle0"][1], points["2A_isle0"][1]
-    #print(prep_corners[0])
-    corners = calculate_box(prep_corners) # west, south, east,  north
+    # prep_corners = points["29"][1], points["59"][1], points["2B"][1], points["2A"][1]
+    # print(prep_corners[0])
+    # corners = calculate_box(prep_corners) # west, south, east,  north
     #bottom_left, up_right = (corners[0], corners[1]), (corners[2], corners[3])
-    (x_min, y_min), (x_max, y_max) = (corners[0], corners[3]), (corners[2], corners[1])
+    # (x_min, y_min), (x_max, y_max) = (corners[0], corners[3]), (corners[2], corners[1])
+    #print(points)
+
+    #x_min, y_min, x_max, y_max = -5.0, 52.0, 10.0, 42.0 
+    #x_min, y_min, x_max, y_max = -5.0, 42.0, 10.0, 52.0 
+    x_min, y_min, x_max, y_max = -5.141276481967004, 41.33319101116324, 9.560052982781922, 51.08899110023721
+
+    #
+    #prep_corners = points["29"][1], points["59"][1], points["2B"][1], points["2A"][1]
+    #print(prep_corners[0])
+    #prep_corners = points["29_isle0"][1], points["59_isle0"][1], points["2B_isle0"][1], points["2A_isle0"][1]
+    #corners = calculate_box(prep_corners) # west, south, east,  north
+    #bottom_left, up_right = (corners[0], corners[1]), (corners[2], corners[3])
+    #(x_min, y_min), (x_max, y_max) = (corners[0], corners[3]), (corners[2], corners[1])
     #print(points)
 
     width, height = map_size[0], map_size[1]
@@ -390,10 +438,18 @@ def get_mercator_from_shp(file_name, map_size):
 
 
     scale, x_offset, y_offset = calcule_parametres(x_min_merc, y_min_merc, x_max_merc, y_max_merc, 0, 0, width, height)
+
+    print("parametre", scale, x_offset, y_offset)
+    print(x_min_merc, y_min_merc, x_max_merc, y_max_merc)
+    # -5.0 61.08656629615306 10.0 46.36186715616591
+
     #print(scale, x_offset, y_offset)
+
     departments_mercator = wgs_to_mercator(points)
     placed_departments = place_all_points(departments_mercator, scale, x_offset, y_offset, width, height)
     print("check", departments_mercator == placed_departments)
+    
+    print(placed_departments.keys())
 
     return placed_departments
 
@@ -418,7 +474,23 @@ def get_mercator_from_shp(file_name, map_size):
 
 
 #sf = shapefile.Reader("departements-20180101/departements-20180101.shp")
-#print(get_mercator_from_shp("departements-20180101/departements-20180101.shp", (1200, 500)))
+# test = get_mercator_from_shp("departements-20180101/departements-20180101.shp", (1200, 500))
+# a, b = test["13_isle0"], test["13_isle1"]
+# c, d = test["29_isle0"], test["29_isle300"]
+# print("13" in test.keys())
+# print(test["13"])
+# from requirements import fltk as fltk
+# fltk.cree_fenetre(1200, 500, affiche_repere=True)
+# # fltk.polygone(a[1])
+# # fltk.polygone(b[1])
+# # fltk.polygone(c[1])
+# # fltk.polygone(d[1])
+# # for i in range(463):
+# #     shape = test["29_isle" + str(i)]
+# #     fltk.polygone(shape[1])
+# fltk.attend_ev()
+# fltk.ferme_fenetre()
+
 #get_mercator_from_shp("departements-20180101/departements-20180101.shp", (1200, 500))
 #print(sf.records())
 #print(sf.bbox)
@@ -439,7 +511,8 @@ def get_mercator_from_shp(file_name, map_size):
 
 
 # fichier avec les données
-CSV_DATA_TARGET = "datas/POPULATION_MUNICIPALE_DEPARTEMENT_FRANCE.csv"
+#CSV_DATA_TARGET = "datas/POPULATION_MUNICIPALE_DEPARTEMENT_FRANCE.csv"
+CSV_DATA_TARGET = "/home/25_malima-mi-1/melanie.souchu/Documents/DLMI1_2025-2026/APP1/probl-me-3-visualisation-de-donn-es-g-ographiques-123-lilian-adam-melanie/datas/POPULATION_MUNICIPALE_DEPARTEMENT_FRANCE.csv"
 CSV_INDEX_NUM = 2  # index du num├®ro de d├®partement (INSEE) dans le fichier csv
 
 def get_data_from_csv(filepath: str) -> dict:

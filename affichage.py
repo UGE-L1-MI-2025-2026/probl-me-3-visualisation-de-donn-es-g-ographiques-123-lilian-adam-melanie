@@ -47,6 +47,7 @@ def get_index_str_in_lst(lst, string) -> int:
 
 def afficher_carte_coloree(file_name, epoque: str = "p21_pop"):
     departements_shp = get_mercator_from_shp(file_name, (largeur, hauteur))
+    #print(departements_shp)
 
     pop_max = get_population_max(epoque)
     pop_min = get_population_min(epoque)
@@ -63,7 +64,8 @@ def afficher_carte_coloree(file_name, epoque: str = "p21_pop"):
                 num_dep = num_dep[0:i]
                 break
         
-        if num_dep == "69D" or num_dep == "69M":
+        #if num_dep == "69D" or num_dep == "69M":
+        if num_dep[0:2] == "69":
             num_dep = "69"
 
         print(f"aaa{num_dep = }")
@@ -78,3 +80,30 @@ def afficher_carte_coloree(file_name, epoque: str = "p21_pop"):
         fltk.polygone(points, couleur = "black", remplissage = col_dep, epaisseur = 1)
     
     
+
+    
+    fltk.polygone([(2.3923284961351237, 48.335929161584076), (2.393003669902668, 48.336290983108846), (2.3940130169559044, 48.3356802622364), (2.3951130129955068, 48.3349251161054)],#points_dep, #points qui délimitent le département
+    couleur='black',
+    remplissage = 'blue', # pour plus tard : remp_coul variable change de couleurs en fonction des données
+    epaisseur = 5
+    )
+
+fltk.cree_fenetre(largeur,hauteur, affiche_repere=True)
+#afficher_carte_coloree("departements-20180101-shp/departements-20180101")
+#afficher_carte_coloree("departements-20180101/departements-20180101.shp")
+FILE_NAME = "/home/25_malima-mi-1/melanie.souchu/Documents/DLMI1_2025-2026/APP1/probl-me-3-visualisation-de-donn-es-g-ographiques-123-lilian-adam-melanie/departements-20180101/departements-20180101.shp"
+afficher_carte_coloree(FILE_NAME)
+print("done")
+dessiner_legende()
+
+while True:
+    fltk.mise_a_jour()
+    event = fltk.donne_ev()
+    type_event = fltk.type_ev(event)
+    if type_event == "Quitte":
+        break
+
+
+
+
+#print(GLOBAL_DEPARTEMENTS)
