@@ -34,6 +34,7 @@ def get_index_str_in_lst(lst, string) -> int:
 
 def afficher_carte_coloree(file_name, epoque: str = "p21_pop"):
     departements_shp = get_mercator_from_shp(file_name, (largeur, hauteur))
+    #print(departements_shp)
 
     pop_max = get_population_max(epoque)
     pop_min = get_population_min(epoque)
@@ -55,7 +56,7 @@ def afficher_carte_coloree(file_name, epoque: str = "p21_pop"):
 
         dep_pop = int(get_departement(num_dep)[epoque])
         col_dep = get_couleur(dep_pop, pop_min, pop_max, PALETTE_COULEURS)
-<<<<<<< HEAD
+
         #col_dep = "white"
         #print(col_dep)
 
@@ -71,7 +72,9 @@ def afficher_carte_coloree(file_name, epoque: str = "p21_pop"):
 
 fltk.cree_fenetre(largeur,hauteur, affiche_repere=True)
 #afficher_carte_coloree("departements-20180101-shp/departements-20180101")
-afficher_carte_coloree("departements-20180101/departements-20180101.shp")
+#afficher_carte_coloree("departements-20180101/departements-20180101.shp")
+FILE_NAME = "/home/25_malima-mi-1/melanie.souchu/Documents/DLMI1_2025-2026/APP1/probl-me-3-visualisation-de-donn-es-g-ographiques-123-lilian-adam-melanie/departements-20180101/departements-20180101.shp"
+afficher_carte_coloree(FILE_NAME)
 print("done")
 dessiner_legende()
 
@@ -82,15 +85,8 @@ while True:
     if type_event == "Quitte":
         break
 
-fltk.ferme_fenetre
-=======
-        #print(col_dep)
 
-        fltk.polygone(points, couleur = "black", remplissage = col_dep, epaisseur = 1)
-        count += 1
 
-    print(f"departements affichés: {count}")
->>>>>>> f3f7bb6d71ebaa7d089edc1fed3cc609ff1d1ad3
 
 #print(GLOBAL_DEPARTEMENTS)
 
