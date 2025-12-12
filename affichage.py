@@ -87,23 +87,3 @@ def afficher_carte_coloree(file_name, epoque: str = "p21_pop"):
     remplissage = 'blue', # pour plus tard : remp_coul variable change de couleurs en fonction des données
     epaisseur = 5
     )
-
-fltk.cree_fenetre(largeur,hauteur, affiche_repere=True)
-#afficher_carte_coloree("departements-20180101-shp/departements-20180101")
-#afficher_carte_coloree("departements-20180101/departements-20180101.shp")
-FILE_NAME = "/home/25_malima-mi-1/melanie.souchu/Documents/DLMI1_2025-2026/APP1/probl-me-3-visualisation-de-donn-es-g-ographiques-123-lilian-adam-melanie/departements-20180101/departements-20180101.shp"
-afficher_carte_coloree(FILE_NAME)
-print("done")
-dessiner_legende()
-
-while True:
-    fltk.mise_a_jour()
-    event = fltk.donne_ev()
-    type_event = fltk.type_ev(event)
-    if type_event == "Quitte":
-        break
-
-
-
-
-#print(GLOBAL_DEPARTEMENTS)

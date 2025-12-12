@@ -512,7 +512,7 @@ def get_mercator_from_shp(file_name, map_size):
 
 # fichier avec les données
 #CSV_DATA_TARGET = "datas/POPULATION_MUNICIPALE_DEPARTEMENT_FRANCE.csv"
-CSV_DATA_TARGET = "/home/25_malima-mi-1/melanie.souchu/Documents/DLMI1_2025-2026/APP1/probl-me-3-visualisation-de-donn-es-g-ographiques-123-lilian-adam-melanie/datas/POPULATION_MUNICIPALE_DEPARTEMENT_FRANCE.csv"
+CSV_DATA_TARGET = "datas/POPULATION_MUNICIPALE_DEPARTEMENT_FRANCE.csv"
 CSV_INDEX_NUM = 2  # index du num├®ro de d├®partement (INSEE) dans le fichier csv
 
 def get_data_from_csv(filepath: str) -> dict:
