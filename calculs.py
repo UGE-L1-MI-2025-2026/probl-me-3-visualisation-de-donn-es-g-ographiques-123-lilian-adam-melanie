@@ -106,7 +106,7 @@ for each polygon:
 
 def calculate_box(corners):
     west, south, east, north = corners[0][0][0], corners[0][0][1], corners[0][0][0], corners[0][0][1]
-    print(west, south, east, north)
+    #print(west, south, east, north)
     for i in range(len(corners)):
         for point in corners[i]:
             if point[0] <= west: west = point[0]
@@ -159,8 +159,36 @@ def get_points(sf, outremers= False) -> typing.Dict[str, int]:
     for i in range(len(sf_shapes)):
         curr_record = sf.record(i)
         #if not(outremers) and len(curr_record[0]) < 3: departments[curr_record[0]] = [curr_record[1], sf.shape(i).points]
+<<<<<<< HEAD
+        if (curr_record[0][0:2] != "69") and outremers and len(curr_record[0]) >= 3: continue
+
+        elif len(curr_shape_parts) <= 1: 
+            print("full department, no isle", curr_record[0])
+            departments[curr_record[0]] = [curr_record[1], sf.shape(i).points]
+            if curr_record[0][0:2] == "69": print("69 RHONE", curr_shape_parts)
+        else:
+            #print("ISLEEEEE", curr_shape_parts)
+            curr_shape_points = curr_shape.points
+            #for k in range(1, len(curr_shape_parts)):
+            k = 0
+            while k < len(curr_shape_parts) -1:
+                
+                curr_department_id, curr_department_name = curr_record[0] + "_isle" + str(k), curr_record[1] + "_isle" + str(k)
+                print("isle id, isle name",  curr_department_id, curr_department_name)
+                if curr_record[0][0:2] == "69":
+                    print("69 RHONE", curr_shape_parts)
+                    #print("k, record k", k, curr_shape_parts[k-1], curr_shape_parts[k])
+                #start_idx, end_idx = curr_shape_parts[k-1], curr_shape_parts[k]
+                start_idx, end_idx = curr_shape_parts[k], curr_shape_parts[k+1]
+                curr_points = curr_shape_points[start_idx: end_idx]
+                #print("curr points of ISLEEEE", curr_points)
+                departments[curr_department_id] = [curr_department_name, curr_points]
+                k = k + 1
+
+=======
         if outremers and len(curr_record[0]) >= 3: continue
         else: departments[curr_record[0]] = [curr_record[1], sf.shape(i).points]
+>>>>>>> f3f7bb6d71ebaa7d089edc1fed3cc609ff1d1ad3
         
     return departments
 
@@ -212,7 +240,11 @@ def get_mercator_from_shp_bis(file_name, map_size, map_scale=0.00005):
     mercator_points = convert_wgs_to_mercator(points, center= map_center, scale= scale, map_scale=map_size, distance=distance)
     return mercator_points
 
+<<<<<<< HEAD
+=======
 
+"""
+>>>>>>> f3f7bb6d71ebaa7d089edc1fed3cc609ff1d1ad3
 def try_stuff(file_name, map_size):
     sf = import_shp(file_name)
     points = get_points(sf)
@@ -220,7 +252,8 @@ def try_stuff(file_name, map_size):
     bottom_left, up_right = (corners[0], corners[1]), (corners[2], corners[3])
     distance_bl, distance_ur = get_distance((0, 0), bottom_left), get_distance((map_size, up_right))
 
-
+"""
+"""
 def do_everything(departments, box, map_size):
     departments_mercator : typing.Dict[str, typing.List[str, typing.List[typing.Tuple[float, float]]]] = {
 
@@ -239,7 +272,7 @@ def do_everything(departments, box, map_size):
         departments_mercator[department] = [ departments[department][0], new_points ]
 
     return departments_mercator
-
+"""
 
 from math import log, tan, pi, radians, degrees
 
@@ -263,7 +296,7 @@ def calcule_parametres(x_min, y_min, x_max, y_max, x_orig, y_orig, W, H): # -> (
 
 #place_point = lambda x, y, a, B, C: (a * x + B, -a * y + C)
 def place_point(x, y, a, B, C):
-    return (a*x) + B, ((0-a)*y) + C
+    return (a*x) + B, ((-a)*y) + C
 
 
 def wgs_to_mercator_bis(departments, scale, x_offset, y_offset):
@@ -295,6 +328,10 @@ def wgs_to_mercator(departments):
         new_points : typing.List[typing.Tuple[float, float]] = [ ]
         for curr_point in departments[department][1]:
             merc_curr_point = mercator(curr_point[0], curr_point[1])
+<<<<<<< HEAD
+            #merc_curr_point = -merc_curr_point_bis[0], merc_curr_point_bis[1]
+=======
+>>>>>>> f3f7bb6d71ebaa7d089edc1fed3cc609ff1d1ad3
             new_points.append(merc_curr_point)
         departments_mercator[department] = [ departments[department][0], new_points ]
 
@@ -340,15 +377,29 @@ def get_mercator_from_shp(file_name, map_size):
     outremers = True
     sf = import_shp(file_name)
     points = get_points(sf, outremers)
+<<<<<<< HEAD
+    # prep_corners = points["29"][1], points["59"][1], points["2B"][1], points["2A"][1]
+    # print(prep_corners[0])
+    # corners = calculate_box(prep_corners) # west, south, east,  north
+    #bottom_left, up_right = (corners[0], corners[1]), (corners[2], corners[3])
+    # (x_min, y_min), (x_max, y_max) = (corners[0], corners[3]), (corners[2], corners[1])
+    #print(points)
+
+    #x_min, y_min, x_max, y_max = -5.0, 52.0, 10.0, 42.0 
+    #x_min, y_min, x_max, y_max = -5.0, 42.0, 10.0, 52.0 
+    x_min, y_min, x_max, y_max = -5.141276481967004, 41.33319101116324, 9.560052982781922, 51.08899110023721
+=======
     prep_corners = points["29"][1], points["59"][1], points["2B"][1], points["2A"][1]
-    print(prep_corners[0])
+    #print(prep_corners[0])
     corners = calculate_box(prep_corners) # west, south, east,  north
     #bottom_left, up_right = (corners[0], corners[1]), (corners[2], corners[3])
     (x_min, y_min), (x_max, y_max) = (corners[0], corners[3]), (corners[2], corners[1])
     #print(points)
+>>>>>>> f3f7bb6d71ebaa7d089edc1fed3cc609ff1d1ad3
 
     width, height = map_size[0], map_size[1]
     box_x_min, box_y_min, box_x_max, box_y_max = sf.bbox
+    #x_min, y_min, x_max, y_max = sf.bbox
 
     if not(outremers):
         if box_x_min <= x_min: x_min = box_x_min
@@ -357,12 +408,20 @@ def get_mercator_from_shp(file_name, map_size):
         if y_max <= box_y_max: y_max = box_y_max
 
     (x_min_merc, y_min_merc), (x_max_merc, y_max_merc) = mercator(x_min, y_min), mercator(x_max, y_max)
+    print(x_min, y_min, x_max, y_max)
+
 
     scale, x_offset, y_offset = calcule_parametres(x_min_merc, y_min_merc, x_max_merc, y_max_merc, 0, 0, width, height)
-    print(scale, x_offset, y_offset)
+<<<<<<< HEAD
+    print("parametre", scale, x_offset, y_offset)
+    print(x_min_merc, y_min_merc, x_max_merc, y_max_merc)
+    # -5.0 61.08656629615306 10.0 46.36186715616591
+=======
+    #print(scale, x_offset, y_offset)
+>>>>>>> f3f7bb6d71ebaa7d089edc1fed3cc609ff1d1ad3
     departments_mercator = wgs_to_mercator(points)
     placed_departments = place_all_points(departments_mercator, scale, x_offset, y_offset, width, height)
-    #print(departments_mercator == placed_departments)
+    print("check", departments_mercator == placed_departments)
 
     return placed_departments
 
@@ -386,7 +445,9 @@ def get_mercator_from_shp(file_name, map_size):
 
 
 
-#sf = shapefile.Reader("departements-20180101-shp/departements-20180101.shp")
+#sf = shapefile.Reader("departements-20180101/departements-20180101.shp")
+#print(get_mercator_from_shp("departements-20180101/departements-20180101.shp", (1200, 500)))
+#get_mercator_from_shp("departements-20180101/departements-20180101.shp", (1200, 500))
 #print(sf.records())
 #print(sf.bbox)
 #print(get_points(sf))
@@ -429,14 +490,32 @@ def get_data_from_csv(filepath: str) -> dict:
     departements["headers"] = headers
     return departements
 
+GLOBAL_DEPARTEMENTS = get_data_from_csv(CSV_DATA_TARGET)
 
 def get_departement(departement: str) -> dict | None:
-    res = get_data_from_csv(CSV_DATA_TARGET)
-    if departement in res.keys():
-        return res[departement]
+    if departement in GLOBAL_DEPARTEMENTS.keys():
+        return GLOBAL_DEPARTEMENTS[departement]
     return None
 
+def get_index(s: str, c: str) -> int:
+    i = 0
+    while c != s[i]:
+        i+=1
+        
+    return i
 
+def add_ile(num_dep: str, num_ile = '1'):
+    """
+    Modifie GLOBAL_DEPARTEMENT pour rajouter l'ile
+    """
+    numero = int(num_ile)
+    num_ile = f"{num_dep}i{numero}"
+    while num_ile in GLOBAL_DEPARTEMENTS:
+        numero += 1
+        num_ile = f"{num_dep}i{numero}"
+    
+    GLOBAL_DEPARTEMENTS[num_ile] = GLOBAL_DEPARTEMENTS[num_dep]
+    print(f"nouvelle ile pour le {num_dep}: ile numero {numero} ({num_ile})")
 
 
 BLEU = "#42009E"
@@ -481,8 +560,27 @@ def get_population_min(cle_annee = "p21_pop") -> int:
 
     return curr_min
 
+# source: https://coolors.co/palette/ff4800-ff5400-ff6000-ff6d00-ff7900-ff8500-ff9100-ff9e00-ffaa00-ffb600
+# PALETTE_COULEURS = [
+#     "#03071E",
+#     "#370617",
+#     "#6A040F",
+#     "#9D0208",
+#     "#D00000",
+#     "#DC2F02",
+#     "#E85D04",
+#     "#F48C06",
+#     "#FAA307",
+#     "#FFBA08"
+# ]
+
+
 # source: https://coolors.co/
+
+
 PALETTE_COULEURS = ["#370617","#6a040f","#9d0208","#d00000","#dc2f02","#e85d04","#f48c06","#faa307","#ffba08"]
+
+
 PALETTE_COULEURS.reverse()
 
 def get_couleur(val: float, valeur_min: float, valeur_max: float, couleurs: list = PALETTE_COULEURS) -> str:
@@ -491,46 +589,10 @@ def get_couleur(val: float, valeur_min: float, valeur_max: float, couleurs: list
     normalise = int(normalise)
     normalise = min(normalise, len(couleurs)-1)
 
+    # if couleurs == None:
+    #     couleurs = [JAUNE, ORANGE, ROSE, VIOLET, BLEU]
+
     return couleurs[normalise]
 
 
 HEADER_INDEX_POP = 5
-
-
-def main():
-    headers = get_departement("headers")
-    
-    departement = get_departement("75")
-    print(departement["nom_dep"])
-
-
-    epoques = headers[5:]
-    for epoque in epoques:
-        couleur = get_couleur(int(departement[epoque]), get_population_max(epoque), get_population_min(epoque), PALETTE_COULEURS)
-        print(
-            f"{epoque = }"
-            f"population: {departement[epoque]}, couleur = {couleur}"
-        )
-
-
-
-    print("=" * 100)
-
-
-    departement = get_departement("94")
-    print(departement["nom_dep"])
-
-
-    epoques = headers[5:]
-    for epoque in epoques:
-        couleur = get_couleur(int(departement[epoque]), get_population_max(epoque), get_population_min(epoque), PALETTE_COULEURS)
-        print(
-            f"{epoque = }"
-            f"population: {departement[epoque]}, couleur = {couleur}"
-        )
-
-
-
-
-if __name__ == "__main__":
-    main()

@@ -48,23 +48,38 @@ def get_index_str_in_lst(lst, string) -> int:
 
 def afficher_carte_coloree(file_name, epoque: str = "p21_pop"):
     departements_shp = get_mercator_from_shp(file_name, (largeur, hauteur))
-    headers = get_departement("headers")
 
     pop_max = get_population_max(epoque)
     pop_min = get_population_min(epoque)
 
+    count = 0
     for num_dep in departements_shp:
+        #print(f"{num_dep = }")
         points = departements_shp[num_dep][1]
+        #print("num_dep, points", num_dep, points)
+        num_dep_save = num_dep
+
+        for i in range(len(num_dep)):
+            if num_dep[i] == "_":
+                num_dep = num_dep[0:i]
+                break
+
+        if num_dep[0:2] == "69":
+            num_dep = "69"
+
         dep_pop = int(get_departement(num_dep)[epoque])
         col_dep = get_couleur(dep_pop, pop_min, pop_max, PALETTE_COULEURS)
-        print(col_dep)
+<<<<<<< HEAD
+        #col_dep = "white"
+        #print(col_dep)
 
         fltk.polygone(points, couleur = "black", remplissage = col_dep, epaisseur = 1)
     
     
 
 fltk.cree_fenetre(largeur,hauteur, affiche_repere=True)
-afficher_carte_coloree("departements-20180101-shp/departements-20180101")
+#afficher_carte_coloree("departements-20180101-shp/departements-20180101")
+afficher_carte_coloree("departements-20180101/departements-20180101.shp")
 print("done")
 dessiner_legende()
 
@@ -76,6 +91,14 @@ while True:
         break
 
 fltk.ferme_fenetre
+=======
+        #print(col_dep)
 
+        fltk.polygone(points, couleur = "black", remplissage = col_dep, epaisseur = 1)
+        count += 1
 
+    print(f"departements affichés: {count}")
+>>>>>>> f3f7bb6d71ebaa7d089edc1fed3cc609ff1d1ad3
+
+#print(GLOBAL_DEPARTEMENTS)
 
