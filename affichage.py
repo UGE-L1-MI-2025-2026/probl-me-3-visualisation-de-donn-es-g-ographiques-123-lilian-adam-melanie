@@ -80,10 +80,3 @@ def afficher_carte_coloree(file_name, epoque: str = "p21_pop"):
         fltk.polygone(points, couleur = "black", remplissage = col_dep, epaisseur = 1)
     
     
-
-    
-    fltk.polygone([(2.3923284961351237, 48.335929161584076), (2.393003669902668, 48.336290983108846), (2.3940130169559044, 48.3356802622364), (2.3951130129955068, 48.3349251161054)],#points_dep, #points qui délimitent le département
-    couleur='black',
-    remplissage = 'blue', # pour plus tard : remp_coul variable change de couleurs en fonction des données
-    epaisseur = 5
-    )
