@@ -32,6 +32,7 @@ def dessiner_legende(epoque: str = "p21_pop"):
         pop_année = pop_min + moy*i
             
         fltk.texte(ax-140, ay, pop_année)
+        ay=taille_y * max(1, i)
         fltk.rectangle(
             ax, ay, bx, by,
             couleur = "black", remplissage=couleur, epaisseur=1
