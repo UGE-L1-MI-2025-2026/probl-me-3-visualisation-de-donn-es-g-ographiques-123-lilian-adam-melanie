@@ -26,7 +26,9 @@ while True:
 
         print(headers[HEADER_INDEX_POP + epoque])
         start = time()
+        fltk.efface_tout()
         afficher_carte_coloree(FILEPATH, headers[HEADER_INDEX_POP + epoque])
+        dessiner_legende(headers[HEADER_INDEX_POP + epoque])
         end = time()
 
         print(f"temps de chargement: {round(end - start, 2)}s")

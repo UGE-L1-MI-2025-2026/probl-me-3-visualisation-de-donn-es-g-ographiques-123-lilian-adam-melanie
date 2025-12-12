@@ -17,11 +17,9 @@ def dessiner_legende(epoque: str = "p21_pop"):
     bx=largeur
     by=(taille_y**2)
 
-    headers = get_departement("headers")
-    epoques = headers[HEADER_INDEX_POP:]
-    for epoque in epoques:
-        pop_min = get_population_min(epoque)
-        pop_max = get_population_max(epoque)
+
+    pop_min = get_population_min(epoque)
+    pop_max = get_population_max(epoque)
     for i, couleur in enumerate(PALETTE_COULEURS):
         ax=largeur - taille_x
         ay=taille_y * max(0, i)
